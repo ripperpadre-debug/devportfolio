@@ -24,3 +24,26 @@ class DatabaseConfigTests(SimpleTestCase):
 
         self.assertEqual(config['ENGINE'], 'django.db.backends.postgresql')
         self.assertEqual(config['OPTIONS']['sslmode'], 'require')
+
+    def test_media_root_falls_back_to_tempdir_when_target_is_not_writable(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            media_dir = Path(tmpdir) / 'read-only-media'
+            media_dir.mkdir(parents=True)
+            os.chmod(media_dir, 0o555)
+            try:
+                resolved_path = portfolio_settings.resolve_media_root(media_dir)
+            finally:
+                os.chmod(media_dir, 0o755)
+
+            self.assertEqual(resolved_path, Path(tempfile.gettempdir()) / 'devportfolio-media')
+
+    def test_media_root_falls_back_when_directory_cannot_accept_new_files(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            media_dir = Path(tmpdir) / 'media'
+            media_dir.mkdir(parents=True)
+
+            with patch('portfolio.settings.os.access', return_value=True), \
+                 patch('portfolio.settings.tempfile.NamedTemporaryFile', side_effect=OSError('read-only filesystem')):
+                resolved_path = portfolio_settings.resolve_media_root(media_dir)
+
+            self.assertEqual(resolved_path, Path(tempfile.gettempdir()) / 'devportfolio-media')

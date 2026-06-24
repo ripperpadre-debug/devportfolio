@@ -109,6 +109,25 @@ def sqlite_database_config():
     }
 
 
+def resolve_media_root(configured_path=None):
+    candidate = Path(configured_path or os.environ.get('MEDIA_ROOT') or BASE_DIR / 'media')
+    if not candidate.is_absolute():
+        candidate = BASE_DIR / candidate
+
+    try:
+        candidate.mkdir(parents=True, exist_ok=True)
+        if os.access(candidate, os.W_OK):
+            with tempfile.NamedTemporaryFile(dir=str(candidate), delete=True) as handle:
+                handle.write(b'.')
+            return candidate
+    except OSError:
+        pass
+
+    fallback = Path(tempfile.gettempdir()) / 'devportfolio-media'
+    fallback.mkdir(parents=True, exist_ok=True)
+    return fallback
+
+
 def postgres_database_config_from_url(database_url):
     parsed = urlparse(database_url)
     config = {
@@ -183,7 +202,7 @@ STATICFILES_DIRS = [BASE_DIR / 'core' / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = resolve_media_root()
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
