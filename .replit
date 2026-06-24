@@ -37,3 +37,9 @@ externalPort = 80
 [deployment]
 deploymentTarget = "autoscale"
 run = ["gunicorn", "--bind=0.0.0.0:5000", "--reuse-port", "portfolio.wsgi:application"]
+
+[userenv]
+
+[userenv.shared]
+NOTIFY_EMAIL = "ripperpadre@gmail.com"
+EMAIL_HOST_USER = "ripperpadre@gmail.com"
