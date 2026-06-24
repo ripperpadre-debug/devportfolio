@@ -13,8 +13,8 @@
     text-decoration: none; transition: all var(--transition);
     white-space: nowrap;
   }
-  .filter-btn:hover { background: rgba(0,212,255,0.07); border-color: rgba(0,212,255,0.3); color: var(--text); }
-  .filter-btn.active { background: rgba(0,212,255,0.1); border-color: var(--accent); color: var(--accent); }
+  .filter-btn:hover { background: rgba(31,191,138,0.07); border-color: rgba(31,191,138,0.3); color: var(--text); }
+  .filter-btn.active { background: rgba(31,191,138,0.1); border-color: var(--accent); color: var(--accent); }
 
   .project-thumb {
     height: 190px; background: var(--surface2);
@@ -73,7 +73,7 @@
           <div style="display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center">
             <span class="tag">{{ project.get_category_display }}</span>
             <span class="project-status status-{{ project.status }}">● {{ project.get_status_display }}</span>
-            {% if project.featured %}<span class="tag" style="color:#A78BFA;border-color:rgba(124,58,237,0.35)">★ Featured</span>{% endif %}
+            {% if project.featured %}<span class="tag" style="color:#F4816E;border-color:rgba(139,26,46,0.35)">★ Featured</span>{% endif %}
           </div>
           <h3 class="project-title">{{ project.title }}</h3>
           {% if project.tagline %}<p class="project-tagline">{{ project.tagline }}</p>{% endif %}
