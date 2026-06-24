@@ -12,7 +12,7 @@ import os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'portfolio.settings')
 
 from django.core.wsgi import get_wsgi_application
-from portfolio.startup import run_startup_migrations
+from portfolio.startup import run_startup_tasks
 
 application = get_wsgi_application()
-run_startup_migrations()
+run_startup_tasks()

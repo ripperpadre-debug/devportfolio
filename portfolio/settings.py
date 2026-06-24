@@ -55,6 +55,13 @@ TEMPLATES = [
 WSGI_APPLICATION = 'portfolio.wsgi.application'
 
 
+def sqlite_sync_source_path():
+    source_path = Path(os.environ.get('SQLITE_SYNC_SOURCE', BASE_DIR / 'db.sqlite3'))
+    if not source_path.is_absolute():
+        source_path = BASE_DIR / source_path
+    return source_path
+
+
 def sqlite_database_config():
     return {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -103,6 +110,10 @@ def database_config():
 
 DATABASES = {
     'default': database_config(),
+    'sqlite_source': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': sqlite_sync_source_path(),
+    },
 }
 
 AUTH_PASSWORD_VALIDATORS = [

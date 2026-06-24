@@ -12,6 +12,10 @@ import os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'portfolio.settings')
 
 from django.core.asgi import get_asgi_application
+from portfolio.startup import run_startup_tasks
+
+application = get_asgi_application()
+run_startup_tasks()
 from portfolio.startup import run_startup_migrations
 
 application = get_asgi_application()
