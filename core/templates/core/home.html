@@ -1,63 +1,78 @@
 {% extends 'core/base.html' %}
-{% block title %}{{ profile.name }} — Full Stack Developer & Data Scientist{% endblock %}
+{% block title %}{{ profile.name|default:"Portfolio" }} — Full Stack Developer & Data Scientist{% endblock %}
 
 {% block extra_head %}
 <style>
-  /* HERO */
+  /* ── HERO ── */
   .hero {
-    min-height: 100vh; display: flex; align-items: center;
-    position: relative; overflow: hidden; padding: 0;
+    min-height: calc(100vh - var(--nav-h));
+    display: flex; align-items: center;
+    position: relative; overflow: hidden; padding: clamp(3rem, 8vw, 5rem) 0;
   }
   .hero-bg {
     position: absolute; inset: 0; z-index: 0;
-    background: radial-gradient(ellipse 80% 60% at 60% 40%, rgba(124,58,237,0.12) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 50% at 20% 80%, rgba(0,212,255,0.08) 0%, transparent 60%);
+    background:
+      radial-gradient(ellipse 70% 55% at 65% 35%, rgba(124,58,237,0.14) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 45% at 15% 75%, rgba(0,212,255,0.09) 0%, transparent 60%);
   }
   .hero-grid {
     position: absolute; inset: 0;
-    background-image: linear-gradient(rgba(30,48,80,0.3) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(30,48,80,0.3) 1px, transparent 1px);
-    background-size: 60px 60px;
+    background-image:
+      linear-gradient(rgba(30,48,80,0.25) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30,48,80,0.25) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
   }
-  .hero-content { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 2rem; width: 100%; }
-  .hero-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+  .hero-content { position: relative; z-index: 1; width: 100%; }
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: clamp(2.5rem, 5vw, 5rem);
+    align-items: center;
+  }
 
   .hero-badge {
     display: inline-flex; align-items: center; gap: 0.5rem;
-    padding: 0.4rem 1rem; border-radius: 100px;
-    background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.25);
-    font-size: 0.8rem; color: var(--accent); font-family: var(--font-mono);
-    margin-bottom: 1.5rem;
+    padding: 0.35rem 0.875rem; border-radius: 100px;
+    background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.22);
+    font-size: 0.75rem; color: var(--accent); font-family: var(--font-mono);
+    margin-bottom: 1.25rem; letter-spacing: 0.3px;
   }
-  .hero-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.5)} }
+  .hero-badge-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.6)} }
 
-  .hero h1 { margin-bottom: 1.25rem; }
+  .hero h1 { margin-bottom: 1.125rem; }
   .hero h1 .name { display: block; color: var(--text); }
-  .hero h1 .role { display: block; font-size: 0.6em; color: var(--text-muted); font-weight: 400; margin-top: 0.25rem; }
-
-  .hero-desc { font-size: 1.05rem; color: var(--text-muted); margin-bottom: 2rem; max-width: 480px; line-height: 1.75; }
-
-  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem; }
-
-  .hero-stats { display: flex; gap: 2rem; }
-  .stat { text-align: center; }
-  .stat-num { font-size: 1.8rem; font-weight: 700; color: var(--accent); font-family: var(--font-mono); }
-  .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-
-  /* Avatar card */
-  .hero-visual { display: flex; justify-content: center; }
-  .avatar-wrapper {
-    position: relative; width: 340px; height: 340px;
+  .hero h1 .role {
+    display: block;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    color: var(--text-muted); font-weight: 400; margin-top: 0.4rem;
+    line-height: 1.5;
   }
+
+  .hero-desc { font-size: clamp(0.9rem, 1.8vw, 1rem); color: var(--text-muted); margin-bottom: 2rem; max-width: 500px; line-height: 1.8; }
+
+  .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2.75rem; }
+
+  .hero-stats { display: flex; gap: clamp(1.25rem, 3vw, 2.25rem); }
+  .stat { }
+  .stat-num { font-size: clamp(1.5rem, 3.5vw, 2rem); font-weight: 700; color: var(--accent); font-family: var(--font-mono); line-height: 1; }
+  .stat-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.25rem; }
+
+  /* Avatar visual */
+  .hero-visual { display: flex; justify-content: center; align-items: center; }
+  .avatar-wrapper { position: relative; width: clamp(240px, 30vw, 320px); height: clamp(240px, 30vw, 320px); }
   .avatar-ring {
-    position: absolute; inset: -16px;
+    position: absolute; inset: -14px;
     border-radius: 50%; border: 2px solid transparent;
     background: linear-gradient(135deg, var(--accent), var(--accent2), transparent) border-box;
     -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: destination-out; mask-composite: exclude;
-    animation: spin 8s linear infinite;
+    animation: spin 10s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
   .avatar-img {
@@ -69,69 +84,99 @@
     width: 100%; height: 100%; border-radius: 50%;
     background: var(--surface2); border: 3px solid var(--border);
     display: flex; align-items: center; justify-content: center;
-    font-size: 5rem;
+    font-size: clamp(3rem, 8vw, 5rem);
   }
   .floating-badge {
-    position: absolute; padding: 0.6rem 1rem;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 10px; font-size: 0.8rem; font-weight: 600;
-    display: flex; align-items: center; gap: 0.5rem;
+    position: absolute; padding: 0.5rem 0.875rem;
+    background: rgba(12, 21, 38, 0.9); border: 1px solid var(--border);
+    border-radius: 10px; font-size: 0.75rem; font-weight: 600;
+    display: flex; align-items: center; gap: 0.4rem;
     box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    backdrop-filter: blur(8px);
+    white-space: nowrap;
   }
-  .fb-1 { top: 10px; right: -30px; }
-  .fb-2 { bottom: 30px; left: -30px; }
-  .fb-3 { bottom: -10px; right: 10px; }
+  .fb-1 { top: 8%; right: -8%; }
+  .fb-2 { bottom: 22%; left: -10%; }
+  .fb-3 { bottom: -4%; right: 8%; }
 
-  /* SKILLS */
+  /* ── SKILLS ── */
   .skills-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-  .skill-category { margin-bottom: 2.5rem; }
-  .skill-cat-title { font-size: 0.8rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem; font-family: var(--font-mono); }
-  .skill-bars { display: flex; flex-direction: column; gap: 0.75rem; }
-  .skill-bar-row { display: flex; align-items: center; gap: 1rem; }
-  .skill-bar-name { width: 120px; font-size: 0.85rem; color: var(--text); flex-shrink: 0; }
-  .skill-bar-track { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
-  .skill-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 1.2s cubic-bezier(0.4,0,0.2,1); width: 0; }
-  .skill-bar-pct { width: 36px; font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); text-align: right; }
-  .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
+  .skill-category { }
+  .skill-cat-title { font-size: 0.72rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem; font-family: var(--font-mono); }
+  .skill-bars { display: flex; flex-direction: column; gap: 0.7rem; }
+  .skill-bar-row { display: grid; grid-template-columns: 110px 1fr 36px; align-items: center; gap: 0.75rem; }
+  .skill-bar-name { font-size: 0.82rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .skill-bar-track { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .skill-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 1.3s cubic-bezier(0.4,0,0.2,1); width: 0; }
+  .skill-bar-pct { font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono); text-align: right; }
+  .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 1.75rem; }
 
-  /* PROJECT CARDS */
+  /* ── PROJECT CARDS ── */
   .project-card { display: flex; flex-direction: column; }
-  .project-img { height: 200px; object-fit: cover; width: 100%; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 3rem; }
-  .project-img img { width: 100%; height: 100%; object-fit: cover; }
-  .project-body { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
-  .project-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
-  .project-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
-  .project-desc { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; flex: 1; margin-bottom: 1rem; }
-  .project-actions { display: flex; gap: 0.75rem; margin-top: auto; }
-  .project-status { padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.7rem; font-family: var(--font-mono); font-weight: 600; }
+  .project-thumb {
+    height: 190px; background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem; overflow: hidden; flex-shrink: 0;
+  }
+  .project-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .project-body { padding: clamp(1rem, 2.5vw, 1.5rem); flex: 1; display: flex; flex-direction: column; }
+  .project-meta { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.6rem; align-items: center; }
+  .project-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.4rem; line-height: 1.3; }
+  .project-desc { color: var(--text-muted); font-size: 0.875rem; line-height: 1.65; flex: 1; margin-bottom: 0.875rem; }
+  .project-tech { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .project-actions { display: flex; gap: 0.625rem; margin-top: auto; }
+  .project-status { padding: 0.18rem 0.55rem; border-radius: 4px; font-size: 0.68rem; font-family: var(--font-mono); font-weight: 600; }
   .status-live { background: rgba(16,185,129,0.15); color: var(--accent3); }
   .status-in_progress { background: rgba(251,191,36,0.15); color: #FBBF24; }
   .status-archived { background: rgba(107,139,174,0.15); color: var(--text-muted); }
-  .featured-badge { background: rgba(124,58,237,0.15); color: #A78BFA; border: 1px solid rgba(124,58,237,0.3); }
+  .featured-badge { background: rgba(124,58,237,0.15); color: #A78BFA; border-color: rgba(124,58,237,0.3); }
 
-  /* BLOG CARDS */
-  .blog-card { padding: 1.75rem; }
-  .blog-date { font-size: 0.75rem; color: var(--text-dim); font-family: var(--font-mono); margin-bottom: 0.75rem; }
-  .blog-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text); text-decoration: none; display: block; transition: color var(--transition); }
-  .blog-title:hover { color: var(--accent); }
-  .blog-excerpt { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem; }
-  .blog-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  /* ── BLOG CARDS ── */
+  .blog-card { padding: clamp(1.25rem, 3vw, 1.75rem); display: flex; flex-direction: column; }
+  .blog-date { font-size: 0.72rem; color: var(--text-dim); font-family: var(--font-mono); margin-bottom: 0.6rem; }
+  .blog-title-link { font-size: 1.05rem; font-weight: 600; color: var(--text); text-decoration: none; display: block; margin-bottom: 0.4rem; transition: color var(--transition); line-height: 1.4; }
+  .blog-title-link:hover { color: var(--accent); }
+  .blog-excerpt { color: var(--text-muted); font-size: 0.875rem; line-height: 1.65; margin-bottom: 0.875rem; flex: 1; }
+  .blog-tags { display: flex; gap: 0.35rem; flex-wrap: wrap; }
 
-  /* CTA BANNER */
+  /* ── CTA BANNER ── */
   .cta-banner {
-    text-align: center; padding: 5rem 2rem;
-    background: linear-gradient(135deg, rgba(0,212,255,0.05), rgba(124,58,237,0.05));
+    text-align: center;
+    padding: clamp(3.5rem, 8vw, 5.5rem) 1.5rem;
+    background: linear-gradient(135deg, rgba(0,212,255,0.04), rgba(124,58,237,0.06));
     border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    position: relative; overflow: hidden;
   }
-  .cta-banner h2 { margin-bottom: 1rem; }
-  .cta-banner p { color: var(--text-muted); max-width: 500px; margin: 0 auto 2rem; }
+  .cta-banner::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 70% at 50% 50%, rgba(0,212,255,0.04), transparent 70%);
+  }
+  .cta-banner > .container { position: relative; }
+  .cta-banner h2 { margin-bottom: 0.875rem; }
+  .cta-banner p { color: var(--text-muted); max-width: 480px; margin: 0 auto 2rem; line-height: 1.7; }
+  .cta-actions { display: flex; gap: 0.875rem; justify-content: center; flex-wrap: wrap; }
 
-  @media(max-width:768px){
+  /* ── MOBILE ── */
+  @media(max-width: 900px) {
     .hero-inner { grid-template-columns: 1fr; text-align: center; }
-    .hero-visual { display: none; }
-    .hero-stats { justify-content: center; }
+    .hero-visual {
+      order: -1;
+      margin-bottom: 0.5rem;
+    }
+    .avatar-wrapper { width: clamp(180px, 45vw, 260px); height: clamp(180px, 45vw, 260px); }
+    .hero-desc { margin-left: auto; margin-right: auto; }
     .hero-actions { justify-content: center; }
-    .hero-desc { margin: 0 auto 2rem; }
+    .hero-stats { justify-content: center; }
+    .fb-1 { right: -4%; }
+    .fb-2 { left: -4%; }
+  }
+
+  @media(max-width: 480px) {
+    .floating-badge { font-size: 0.68rem; padding: 0.4rem 0.65rem; }
+    .fb-1 { top: -2%; right: 2%; }
+    .fb-2 { bottom: 18%; left: -2%; }
+    .fb-3 { bottom: -8%; right: 6%; }
+    .skill-bar-row { grid-template-columns: 90px 1fr 32px; }
   }
 </style>
 {% endblock %}
@@ -141,10 +186,13 @@
 <section class="hero">
   <div class="hero-bg"></div>
   <div class="hero-grid"></div>
-  <div class="hero-content">
+  <div class="hero-content container">
     <div class="hero-inner">
       <div>
-        <div class="hero-badge">Available for opportunities</div>
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          Available for opportunities
+        </div>
         <h1>
           <span class="name">{{ profile.name|default:"Your Name" }}</span>
           <span class="role">Full Stack Developer · Data Scientist · Problem Solver</span>
@@ -156,11 +204,21 @@
           {% if profile.resume %}<a href="{{ profile.resume.url }}" class="btn btn-ghost" target="_blank">↓ Resume</a>{% endif %}
         </div>
         <div class="hero-stats">
-          <div class="stat"><div class="stat-num">{{ profile.years_experience|default:"3" }}+</div><div class="stat-label">Years Exp.</div></div>
-          <div class="stat"><div class="stat-num">{{ profile.projects_count|default:"20" }}+</div><div class="stat-label">Projects</div></div>
-          <div class="stat"><div class="stat-num">{{ profile.clients_count|default:"10" }}+</div><div class="stat-label">Clients</div></div>
+          <div class="stat">
+            <div class="stat-num">{{ profile.years_experience|default:"4" }}+</div>
+            <div class="stat-label">Years Exp.</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">{{ profile.projects_count|default:"25" }}+</div>
+            <div class="stat-label">Projects</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">{{ profile.clients_count|default:"12" }}+</div>
+            <div class="stat-label">Clients</div>
+          </div>
         </div>
       </div>
+
       <div class="hero-visual">
         <div class="avatar-wrapper">
           <div class="avatar-ring"></div>
@@ -182,15 +240,15 @@
 <section class="skills-section">
   <div class="container">
     <p class="section-label">What I Know</p>
-    <h2 style="margin-bottom:3rem">Skills &amp; Technologies</h2>
-    <div class="skills-grid" id="skillsGrid">
+    <h2 style="margin-bottom:clamp(2rem,5vw,3rem)">Skills &amp; Technologies</h2>
+    <div class="skills-grid">
       {% for category, skills in skill_categories.items %}
       <div class="skill-category reveal">
         <div class="skill-cat-title">{{ category }}</div>
         <div class="skill-bars">
           {% for skill in skills %}
           <div class="skill-bar-row">
-            <span class="skill-bar-name">{{ skill.name }}</span>
+            <span class="skill-bar-name" title="{{ skill.name }}">{{ skill.name }}</span>
             <div class="skill-bar-track">
               <div class="skill-bar-fill" data-width="{{ skill.proficiency }}"></div>
             </div>
@@ -200,7 +258,7 @@
         </div>
       </div>
       {% empty %}
-      <div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:2rem">
+      <div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:2.5rem">
         <p>Add skills via the <a href="/admin/" style="color:var(--accent)">Admin panel</a></p>
       </div>
       {% endfor %}
@@ -212,14 +270,14 @@
 <section>
   <div class="container">
     <p class="section-label">What I've Built</p>
-    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2.5rem;flex-wrap:wrap;gap:1rem">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:clamp(1.5rem,4vw,2.5rem);flex-wrap:wrap;gap:1rem">
       <h2>Featured Projects</h2>
-      <a href="/projects/" class="btn btn-outline">All Projects →</a>
+      <a href="/projects/" class="btn btn-outline btn-sm">All Projects →</a>
     </div>
     <div class="grid-3">
       {% for project in all_projects %}
       <div class="card project-card reveal">
-        <div class="project-img">
+        <div class="project-thumb">
           {% if project.image %}<img src="{{ project.image.url }}" alt="{{ project.title }}">{% else %}💻{% endif %}
         </div>
         <div class="project-body">
@@ -229,20 +287,21 @@
             {% if project.featured %}<span class="tag featured-badge">★ Featured</span>{% endif %}
           </div>
           <h3 class="project-title">{{ project.title }}</h3>
-          <p class="project-desc">{{ project.description|truncatewords:25 }}</p>
-          <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:1rem">
+          <p class="project-desc">{{ project.description|truncatewords:22 }}</p>
+          <div class="project-tech">
             {% for tech in project.get_tech_list %}
             <span class="tag">{{ tech }}</span>
             {% endfor %}
           </div>
           <div class="project-actions">
-            <a href="/projects/{{ project.slug }}/" class="btn btn-primary" style="flex:1;justify-content:center">View Project</a>
-            {% if project.github_url %}<a href="{{ project.github_url }}" class="btn btn-outline" target="_blank">GitHub</a>{% endif %}
+            <a href="/projects/{{ project.slug }}/" class="btn btn-primary" style="flex:1">View Project</a>
+            {% if project.github_url %}<a href="{{ project.github_url }}" class="btn btn-outline" target="_blank" rel="noopener">GitHub</a>{% endif %}
           </div>
         </div>
       </div>
       {% empty %}
-      <div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:3rem">
+      <div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:3rem">
+        <p style="font-size:2.5rem;margin-bottom:1rem">💻</p>
         <p>No projects yet. <a href="/admin/core/project/add/" style="color:var(--accent)">Add your first project →</a></p>
       </div>
       {% endfor %}
@@ -255,16 +314,16 @@
 <section style="background:var(--surface);border-top:1px solid var(--border)">
   <div class="container">
     <p class="section-label">Thoughts &amp; Insights</p>
-    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2.5rem;flex-wrap:wrap;gap:1rem">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:clamp(1.5rem,4vw,2.5rem);flex-wrap:wrap;gap:1rem">
       <h2>Latest Articles</h2>
-      <a href="/blog/" class="btn btn-outline">All Posts →</a>
+      <a href="/blog/" class="btn btn-outline btn-sm">All Posts →</a>
     </div>
     <div class="grid-3">
       {% for post in recent_posts %}
       <div class="card blog-card reveal">
         <div class="blog-date">{{ post.created_at|date:"M d, Y" }}</div>
-        <a href="/blog/{{ post.slug }}/" class="blog-title">{{ post.title }}</a>
-        <p class="blog-excerpt">{{ post.excerpt|truncatewords:20 }}</p>
+        <a href="/blog/{{ post.slug }}/" class="blog-title-link">{{ post.title }}</a>
+        <p class="blog-excerpt">{{ post.excerpt|truncatewords:18 }}</p>
         <div class="blog-tags">
           {% for tag in post.get_tags_list %}
           <span class="tag tag-accent">{{ tag }}</span>
@@ -282,10 +341,10 @@
   <div class="container">
     <p class="section-label">Let's Work Together</p>
     <h2>Have a project in mind?</h2>
-    <p>I'm open to freelance projects, full-time roles, and interesting collaborations. Let's build something great.</p>
-    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+    <p>Open to freelance projects, full-time roles, and interesting collaborations. Let's build something great together.</p>
+    <div class="cta-actions">
       <a href="/contact/" class="btn btn-primary">Start a Conversation →</a>
-      {% if profile.github %}<a href="{{ profile.github }}" class="btn btn-outline" target="_blank">GitHub Profile</a>{% endif %}
+      {% if profile.github %}<a href="{{ profile.github }}" class="btn btn-outline" target="_blank" rel="noopener">GitHub Profile</a>{% endif %}
     </div>
   </div>
 </div>
@@ -293,16 +352,16 @@
 
 {% block extra_js %}
 <script>
-  // Animate skill bars when visible
   const barObserver = new IntersectionObserver((entries) => {
     entries.forEach(e => {
       if (e.isIntersecting) {
         e.target.querySelectorAll('.skill-bar-fill').forEach(bar => {
           bar.style.width = bar.dataset.width + '%';
         });
+        barObserver.unobserve(e.target);
       }
     });
-  }, { threshold: 0.3 });
+  }, { threshold: 0.2 });
   document.querySelectorAll('.skill-category').forEach(el => barObserver.observe(el));
 </script>
 {% endblock %}
