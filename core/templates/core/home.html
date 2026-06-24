@@ -302,7 +302,7 @@
       {% empty %}
       <div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:3rem">
         <p style="font-size:2.5rem;margin-bottom:1rem">💻</p>
-        <p>No projects yet. <a href="/admin/core/project/add/" style="color:var(--accent)">Add your first project →</a></p>
+        <p>No projects yet.{% if request.user.is_staff %} <a href="/dashboard/projects/add/" style="color:var(--accent)">Add your first project →</a>{% endif %}</p>
       </div>
       {% endfor %}
     </div>
