@@ -1,0 +1,126 @@
+{% extends 'core/dashboard/base.html' %}
+{% block title %}{{ action }} Project{% endblock %}
+{% block page_title %}{{ action }} Project{% endblock %}
+{% block nav_projects %}active{% endblock %}
+
+{% block content %}
+<div class="dash-card" style="max-width:900px">
+  <div class="dash-card-header">
+    <span class="dash-card-title">💼 {{ action }} Project</span>
+    <a href="{% url 'dashboard_projects' %}" class="action-btn">← Back</a>
+  </div>
+  <div class="dash-card-body">
+    <form method="POST" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      <div class="form-grid">
+
+        <div class="field-group">
+          <label class="field-label">Title *</label>
+          <input type="text" name="title" value="{{ form.title.value|default:'' }}" class="field-input"
+            placeholder="My Awesome Project" required id="titleInput">
+          {% if form.title.errors %}<p class="field-errors">{{ form.title.errors.0 }}</p>{% endif %}
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Slug <span style="color:var(--text-dim)">(URL identifier)</span></label>
+          <input type="text" name="slug" id="slugInput" value="{{ form.slug.value|default:'' }}" class="field-input"
+            placeholder="my-awesome-project">
+          {% if form.slug.errors %}<p class="field-errors">{{ form.slug.errors.0 }}</p>{% endif %}
+        </div>
+
+        <div class="field-group form-full">
+          <label class="field-label">Tagline <span style="color:var(--text-dim)">(short hook sentence)</span></label>
+          <input type="text" name="tagline" value="{{ form.tagline.value|default:'' }}" class="field-input"
+            placeholder="A one-liner that grabs attention">
+        </div>
+
+        <div class="field-group form-full">
+          <label class="field-label">Description *</label>
+          <textarea name="description" class="field-input" rows="7"
+            placeholder="Describe the project in detail...">{{ form.description.value|default:'' }}</textarea>
+          {% if form.description.errors %}<p class="field-errors">{{ form.description.errors.0 }}</p>{% endif %}
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Category</label>
+          <select name="category" class="field-input">
+            {% for val, label in form.fields.category.choices %}
+            <option value="{{ val }}" {% if form.category.value == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Status</label>
+          <select name="status" class="field-input">
+            {% for val, label in form.fields.status.choices %}
+            <option value="{{ val }}" {% if form.status.value == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="field-group form-full">
+          <label class="field-label">Tech Stack</label>
+          <input type="text" name="tech_stack" value="{{ form.tech_stack.value|default:'' }}" class="field-input"
+            placeholder="Django, React, PostgreSQL, Docker">
+          <p class="field-hint">Comma-separated list — e.g. Python, FastAPI, Redis</p>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">GitHub URL</label>
+          <input type="url" name="github_url" value="{{ form.github_url.value|default:'' }}" class="field-input"
+            placeholder="https://github.com/you/project">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Live URL</label>
+          <input type="url" name="live_url" value="{{ form.live_url.value|default:'' }}" class="field-input"
+            placeholder="https://myproject.com">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Cover Image</label>
+          {% if project.image %}
+          <div class="field-file-current">📷 Current: <a href="{{ project.image.url }}" target="_blank" style="color:var(--accent)">view image</a></div>
+          <label class="field-check">
+            <input type="checkbox" name="image-clear"><span>Remove image</span>
+          </label>
+          {% endif %}
+          <input type="file" name="image" class="field-input" accept="image/*" style="padding:0.5rem">
+        </div>
+
+        <div class="field-group" style="align-self:end">
+          <label class="field-check">
+            <input type="checkbox" name="featured" {% if form.featured.value %}checked{% endif %}>
+            <span>⭐ Mark as Featured <span style="color:var(--text-dim)">(shows on homepage)</span></span>
+          </label>
+        </div>
+
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-save">Save Project</button>
+        <a href="{% url 'dashboard_projects' %}" class="btn-cancel">Cancel</a>
+        {% if project %}
+        <a href="/projects/{{ project.slug }}/" target="_blank" class="action-btn" style="margin-left:auto">↗ View Live</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const titleInput = document.getElementById('titleInput');
+  const slugInput = document.getElementById('slugInput');
+  let userEditedSlug = slugInput.value.length > 0;
+
+  titleInput.addEventListener('input', () => {
+    if (!userEditedSlug) {
+      slugInput.value = titleInput.value.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
+    }
+  });
+  slugInput.addEventListener('input', () => { userEditedSlug = true; });
+</script>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends 'core/dashboard/base.html' %}
+{% block title %}Profile{% endblock %}
+{% block page_title %}Edit Profile{% endblock %}
+{% block nav_profile %}active{% endblock %}
+
+{% block content %}
+<div class="dash-card" style="max-width:900px">
+  <div class="dash-card-header">
+    <span class="dash-card-title">👤 Your Public Profile</span>
+    <a href="/" target="_blank" class="action-btn">↗ Preview Site</a>
+  </div>
+  <div class="dash-card-body">
+    <form method="POST" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      <div class="form-grid">
+
+        <div class="field-group">
+          <label class="field-label" for="{{ form.name.id_for_label }}">Full Name</label>
+          <input type="text" name="{{ form.name.html_name }}" id="{{ form.name.id_for_label }}"
+            value="{{ form.name.value|default:'' }}" class="field-input" placeholder="Alex Kimani">
+          {% if form.name.errors %}<p class="field-errors">{{ form.name.errors.0 }}</p>{% endif %}
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="{{ form.tagline.id_for_label }}">Tagline</label>
+          <input type="text" name="{{ form.tagline.html_name }}" id="{{ form.tagline.id_for_label }}"
+            value="{{ form.tagline.value|default:'' }}" class="field-input" placeholder="Full Stack Developer | Data Scientist">
+        </div>
+
+        <div class="field-group form-full">
+          <label class="field-label">Bio <span style="color:var(--text-dim)">(shows on homepage)</span></label>
+          <textarea name="{{ form.bio.html_name }}" class="field-input" rows="5"
+            placeholder="Tell visitors about yourself...">{{ form.bio.value|default:'' }}</textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Email</label>
+          <input type="email" name="{{ form.email.html_name }}"
+            value="{{ form.email.value|default:'' }}" class="field-input" placeholder="hello@example.com">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Location</label>
+          <input type="text" name="{{ form.location.html_name }}"
+            value="{{ form.location.value|default:'' }}" class="field-input" placeholder="Nairobi, Kenya">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">GitHub URL</label>
+          <input type="url" name="{{ form.github.html_name }}"
+            value="{{ form.github.value|default:'' }}" class="field-input" placeholder="https://github.com/username">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">LinkedIn URL</label>
+          <input type="url" name="{{ form.linkedin.html_name }}"
+            value="{{ form.linkedin.value|default:'' }}" class="field-input" placeholder="https://linkedin.com/in/username">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Twitter / X URL</label>
+          <input type="url" name="{{ form.twitter.html_name }}"
+            value="{{ form.twitter.value|default:'' }}" class="field-input" placeholder="https://twitter.com/username">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Years of Experience</label>
+          <input type="number" name="{{ form.years_experience.html_name }}"
+            value="{{ form.years_experience.value|default:0 }}" class="field-input" min="0">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Projects Count <span style="color:var(--text-dim)">(shown on hero)</span></label>
+          <input type="number" name="{{ form.projects_count.html_name }}"
+            value="{{ form.projects_count.value|default:0 }}" class="field-input" min="0">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Clients Count</label>
+          <input type="number" name="{{ form.clients_count.html_name }}"
+            value="{{ form.clients_count.value|default:0 }}" class="field-input" min="0">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Profile Photo</label>
+          {% if profile.avatar %}
+          <div class="field-file-current">📷 Current: <a href="{{ profile.avatar.url }}" target="_blank" style="color:var(--accent)">view photo</a></div>
+          <label class="field-check" style="margin-top:0.25rem">
+            <input type="checkbox" name="{{ form.avatar.html_name }}-clear">
+            <span>Remove current photo</span>
+          </label>
+          {% endif %}
+          <input type="file" name="{{ form.avatar.html_name }}" class="field-input" accept="image/*" style="padding:0.5rem">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Resume / CV (PDF)</label>
+          {% if profile.resume %}
+          <div class="field-file-current">📄 Current: <a href="{{ profile.resume.url }}" target="_blank" style="color:var(--accent)">view resume</a></div>
+          <label class="field-check" style="margin-top:0.25rem">
+            <input type="checkbox" name="{{ form.resume.html_name }}-clear">
+            <span>Remove current resume</span>
+          </label>
+          {% endif %}
+          <input type="file" name="{{ form.resume.html_name }}" class="field-input" accept=".pdf,.doc,.docx" style="padding:0.5rem">
+        </div>
+
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-save">Save Profile</button>
+        <a href="{% url 'dashboard_home' %}" class="btn-cancel">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

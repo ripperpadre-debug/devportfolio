@@ -1,0 +1,112 @@
+{% extends 'core/dashboard/base.html' %}
+{% block title %}{{ action }} Post{% endblock %}
+{% block page_title %}{{ action }} Blog Post{% endblock %}
+{% block nav_blog %}active{% endblock %}
+
+{% block extra_head %}
+<style>
+  .word-count { font-size:0.75rem; color:var(--text-dim); font-family:var(--mono); margin-top:0.3rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dash-card" style="max-width:900px">
+  <div class="dash-card-header">
+    <span class="dash-card-title">✍️ {{ action }} Post</span>
+    <a href="{% url 'dashboard_blog' %}" class="action-btn">← Back</a>
+  </div>
+  <div class="dash-card-body">
+    <form method="POST" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      <div class="form-grid">
+
+        <div class="field-group form-full">
+          <label class="field-label">Title *</label>
+          <input type="text" name="title" value="{{ form.title.value|default:'' }}" class="field-input"
+            placeholder="How I Built a Real-time Dashboard with Django Channels" required id="titleInput">
+          {% if form.title.errors %}<p class="field-errors">{{ form.title.errors.0 }}</p>{% endif %}
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Slug <span style="color:var(--text-dim)">(URL)</span></label>
+          <input type="text" name="slug" id="slugInput" value="{{ form.slug.value|default:'' }}" class="field-input"
+            placeholder="how-i-built-a-dashboard">
+          {% if form.slug.errors %}<p class="field-errors">{{ form.slug.errors.0 }}</p>{% endif %}
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Tags</label>
+          <input type="text" name="tags" value="{{ form.tags.value|default:'' }}" class="field-input"
+            placeholder="python, django, tutorial">
+          <p class="field-hint">Comma-separated — e.g. machine-learning, python</p>
+        </div>
+
+        <div class="field-group form-full">
+          <label class="field-label">Excerpt <span style="color:var(--text-dim)">(shows on blog listing)</span></label>
+          <textarea name="excerpt" class="field-input" rows="3"
+            placeholder="A short, engaging summary that makes readers want to click...">{{ form.excerpt.value|default:'' }}</textarea>
+        </div>
+
+        <div class="field-group form-full">
+          <label class="field-label">Content *</label>
+          <textarea name="content" id="contentArea" class="field-input" rows="18"
+            placeholder="Write your post here. Use blank lines between paragraphs.">{{ form.content.value|default:'' }}</textarea>
+          <p class="word-count" id="wordCount">0 words</p>
+          {% if form.content.errors %}<p class="field-errors">{{ form.content.errors.0 }}</p>{% endif %}
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Cover Image</label>
+          {% if post.cover_image %}
+          <div class="field-file-current">📷 Current: <a href="{{ post.cover_image.url }}" target="_blank" style="color:var(--accent)">view image</a></div>
+          <label class="field-check">
+            <input type="checkbox" name="cover_image-clear"><span>Remove image</span>
+          </label>
+          {% endif %}
+          <input type="file" name="cover_image" class="field-input" accept="image/*" style="padding:0.5rem">
+        </div>
+
+        <div class="field-group" style="align-self:end">
+          <label class="field-check">
+            <input type="checkbox" name="published" {% if form.published.value %}checked{% endif %}>
+            <span>Publish now <span style="color:var(--text-dim)">(unchecked = draft)</span></span>
+          </label>
+        </div>
+
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-save">Save Post</button>
+        <a href="{% url 'dashboard_blog' %}" class="btn-cancel">Cancel</a>
+        {% if post and post.published %}
+        <a href="/blog/{{ post.slug }}/" target="_blank" class="action-btn" style="margin-left:auto">↗ View Live</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const titleInput = document.getElementById('titleInput');
+  const slugInput = document.getElementById('slugInput');
+  const contentArea = document.getElementById('contentArea');
+  const wordCount = document.getElementById('wordCount');
+  let userEditedSlug = slugInput.value.length > 0;
+
+  titleInput.addEventListener('input', () => {
+    if (!userEditedSlug) {
+      slugInput.value = titleInput.value.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
+    }
+  });
+  slugInput.addEventListener('input', () => { userEditedSlug = true; });
+
+  function updateWordCount() {
+    const words = contentArea.value.trim().split(/\s+/).filter(w => w).length;
+    wordCount.textContent = `${words} word${words !== 1 ? 's' : ''}`;
+  }
+  contentArea.addEventListener('input', updateWordCount);
+  updateWordCount();
+</script>
+{% endblock %}

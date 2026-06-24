@@ -1,0 +1,66 @@
+{% extends 'core/dashboard/base.html' %}
+{% block title %}{{ action }} Skill{% endblock %}
+{% block page_title %}{{ action }} Skill{% endblock %}
+{% block nav_skills %}active{% endblock %}
+
+{% block content %}
+<div class="dash-card" style="max-width:600px">
+  <div class="dash-card-header">
+    <span class="dash-card-title">🧠 {{ action }} Skill</span>
+    <a href="{% url 'dashboard_skills' %}" class="action-btn">← Back</a>
+  </div>
+  <div class="dash-card-body">
+    <form method="POST" novalidate>
+      {% csrf_token %}
+      <div class="form-grid">
+
+        <div class="field-group">
+          <label class="field-label">Skill Name *</label>
+          <input type="text" name="name" value="{{ form.name.value|default:'' }}" class="field-input"
+            placeholder="Python" required>
+          {% if form.name.errors %}<p class="field-errors">{{ form.name.errors.0 }}</p>{% endif %}
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Category</label>
+          <select name="category" class="field-input">
+            {% for val, label in form.fields.category.choices %}
+            <option value="{{ val }}" {% if form.category.value == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Proficiency (0–100)</label>
+          <input type="number" name="proficiency" value="{{ form.proficiency.value|default:80 }}"
+            class="field-input" min="0" max="100" id="profInput">
+          <p class="field-hint" id="profLabel">Shows as an animated bar: <strong id="profVal">{{ form.proficiency.value|default:80 }}</strong>%</p>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Icon / Emoji <span style="color:var(--text-dim)">(optional)</span></label>
+          <input type="text" name="icon" value="{{ form.icon.value|default:'' }}" class="field-input"
+            placeholder="🐍  or leave blank">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Sort Order <span style="color:var(--text-dim)">(lower = first)</span></label>
+          <input type="number" name="order" value="{{ form.order.value|default:0 }}" class="field-input" min="0">
+        </div>
+
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-save">Save Skill</button>
+        <a href="{% url 'dashboard_skills' %}" class="btn-cancel">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+  const profInput = document.getElementById('profInput');
+  const profVal = document.getElementById('profVal');
+  profInput.addEventListener('input', () => { profVal.textContent = profInput.value; });
+</script>
+{% endblock %}

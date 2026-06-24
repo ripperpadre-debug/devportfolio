@@ -1,0 +1,67 @@
+{% extends 'core/dashboard/base.html' %}
+{% block title %}Messages{% endblock %}
+{% block page_title %}Messages{% endblock %}
+{% block nav_messages %}active{% endblock %}
+
+{% block content %}
+<div class="dash-card">
+  <div class="dash-card-header">
+    <span class="dash-card-title">💬 Inbox
+      <span style="color:var(--text-dim);font-weight:400">({{ contact_messages|length }})</span>
+      {% if unread_count %}<span class="badge badge-red" style="margin-left:0.5rem">{{ unread_count }} unread</span>{% endif %}
+    </span>
+  </div>
+  {% if contact_messages %}
+  <div style="overflow-x:auto">
+    <table class="dash-table">
+      <thead><tr>
+        <th>From</th>
+        <th>Subject</th>
+        <th>Message preview</th>
+        <th>Date</th>
+        <th style="text-align:right">Actions</th>
+      </tr></thead>
+      <tbody>
+        {% for msg in contact_messages %}
+        <tr>
+          <td>
+            <div style="font-weight:{% if not msg.read %}700{% else %}400{% endif %};color:{% if not msg.read %}var(--text){% else %}var(--text-muted){% endif %}">
+              {{ msg.name }}
+            </div>
+            <div style="font-size:0.72rem;color:var(--text-dim)">{{ msg.email }}</div>
+          </td>
+          <td>
+            <span {% if not msg.read %}style="color:var(--text);font-weight:600"{% endif %}>
+              {{ msg.subject|default:"(no subject)"|truncatechars:35 }}
+            </span>
+            {% if not msg.read %}<span class="badge badge-red" style="margin-left:0.35rem">new</span>{% endif %}
+          </td>
+          <td style="color:var(--text-dim);max-width:220px">
+            <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ msg.message|truncatechars:60 }}</div>
+          </td>
+          <td style="font-size:0.75rem;font-family:var(--mono);color:var(--text-dim);white-space:nowrap">
+            {{ msg.sent_at|date:"M d, Y" }}
+          </td>
+          <td>
+            <div class="td-actions">
+              <a href="{% url 'dashboard_message_view' msg.pk %}" class="action-btn">Read</a>
+              <form method="POST" action="{% url 'dashboard_message_delete' msg.pk %}" style="display:inline"
+                onsubmit="return confirm('Delete this message from {{ msg.name }}?')">
+                {% csrf_token %}
+                <button type="submit" class="action-btn action-btn-danger">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">📭</div>
+    <p>No messages yet. When visitors send you a message via the contact form, it shows up here.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

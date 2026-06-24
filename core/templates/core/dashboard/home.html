@@ -1,0 +1,147 @@
+{% extends 'core/dashboard/base.html' %}
+{% block title %}Overview{% endblock %}
+{% block page_title %}Overview{% endblock %}
+{% block nav_home %}active{% endblock %}
+
+{% block content %}
+<!-- Stats -->
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-label">Projects</div>
+    <div class="stat-num stat-accent">{{ project_count }}</div>
+    <div class="stat-sub">total projects</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Blog Posts</div>
+    <div class="stat-num stat-green">{{ post_count }}</div>
+    <div class="stat-sub">published · {{ draft_count }} draft{{ draft_count|pluralize }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Skills</div>
+    <div class="stat-num stat-purple">{{ skill_count }}</div>
+    <div class="stat-sub">listed skills</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Inbox</div>
+    <div class="stat-num {% if message_count %}stat-red{% else %}stat-accent{% endif %}">{{ message_count }}</div>
+    <div class="stat-sub">unread message{{ message_count|pluralize }}</div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:1.25rem">
+
+  <!-- Recent Messages -->
+  <div class="dash-card">
+    <div class="dash-card-header">
+      <span class="dash-card-title">💬 Recent Messages</span>
+      <a href="{% url 'dashboard_messages' %}" class="action-btn">View all →</a>
+    </div>
+    {% if recent_messages %}
+    <table class="dash-table">
+      <thead><tr>
+        <th>From</th><th>Subject</th><th>When</th>
+      </tr></thead>
+      <tbody>
+        {% for msg in recent_messages %}
+        <tr>
+          <td>
+            <a href="{% url 'dashboard_message_view' msg.pk %}" style="color:var(--text);text-decoration:none;font-weight:{% if not msg.read %}600{% else %}400{% endif %}">
+              {{ msg.name }}
+            </a>
+            {% if not msg.read %}<span class="badge badge-red" style="margin-left:0.4rem">new</span>{% endif %}
+          </td>
+          <td>{{ msg.subject|default:"(no subject)"|truncatechars:30 }}</td>
+          <td style="white-space:nowrap;font-size:0.75rem;font-family:var(--mono)">{{ msg.sent_at|date:"M d" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">📭</div>
+      <p>No messages yet.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Recent Projects -->
+  <div class="dash-card">
+    <div class="dash-card-header">
+      <span class="dash-card-title">💼 Projects</span>
+      <a href="{% url 'dashboard_project_add' %}" class="action-btn action-btn-primary">+ Add</a>
+    </div>
+    {% if recent_projects %}
+    <table class="dash-table">
+      <thead><tr><th>Title</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        {% for p in recent_projects %}
+        <tr>
+          <td class="td-title">{{ p.title|truncatechars:28 }}</td>
+          <td>
+            {% if p.status == 'live' %}<span class="badge badge-green">Live</span>
+            {% elif p.status == 'in_progress' %}<span class="badge badge-yellow">In Progress</span>
+            {% else %}<span class="badge badge-gray">Archived</span>{% endif %}
+          </td>
+          <td><a href="{% url 'dashboard_project_edit' p.pk %}" class="action-btn">Edit</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">💻</div>
+      <p>No projects yet.</p>
+      <a href="{% url 'dashboard_project_add' %}" class="action-btn action-btn-primary">Add your first project</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Recent Blog -->
+  <div class="dash-card">
+    <div class="dash-card-header">
+      <span class="dash-card-title">✍️ Blog Posts</span>
+      <a href="{% url 'dashboard_post_add' %}" class="action-btn action-btn-primary">+ Write</a>
+    </div>
+    {% if recent_posts %}
+    <table class="dash-table">
+      <thead><tr><th>Title</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        {% for p in recent_posts %}
+        <tr>
+          <td class="td-title">{{ p.title|truncatechars:28 }}</td>
+          <td>
+            {% if p.published %}<span class="badge badge-green">Published</span>
+            {% else %}<span class="badge badge-gray">Draft</span>{% endif %}
+          </td>
+          <td><a href="{% url 'dashboard_post_edit' p.pk %}" class="action-btn">Edit</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">✍️</div>
+      <p>No posts yet.</p>
+      <a href="{% url 'dashboard_post_add' %}" class="action-btn action-btn-primary">Write your first post</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Quick Links -->
+  <div class="dash-card">
+    <div class="dash-card-header">
+      <span class="dash-card-title">⚡ Quick Actions</span>
+    </div>
+    <div class="dash-card-body" style="display:flex;flex-direction:column;gap:0.625rem">
+      <a href="{% url 'dashboard_profile' %}" class="action-btn" style="justify-content:flex-start">👤 &nbsp;Edit Profile & Bio</a>
+      <a href="{% url 'dashboard_project_add' %}" class="action-btn" style="justify-content:flex-start">💼 &nbsp;Add New Project</a>
+      <a href="{% url 'dashboard_skill_add' %}" class="action-btn" style="justify-content:flex-start">🧠 &nbsp;Add New Skill</a>
+      <a href="{% url 'dashboard_post_add' %}" class="action-btn" style="justify-content:flex-start">✍️ &nbsp;Write Blog Post</a>
+      <a href="{% url 'dashboard_messages' %}" class="action-btn" style="justify-content:flex-start">
+        💬 &nbsp;View Messages
+        {% if unread_count %}<span class="sidebar-badge">{{ unread_count }}</span>{% endif %}
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

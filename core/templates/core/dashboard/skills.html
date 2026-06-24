@@ -1,0 +1,61 @@
+{% extends 'core/dashboard/base.html' %}
+{% block title %}Skills{% endblock %}
+{% block page_title %}Skills{% endblock %}
+{% block nav_skills %}active{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'dashboard_skill_add' %}" class="topbar-btn topbar-btn-primary">+ Add Skill</a>
+{% endblock %}
+
+{% block content %}
+<div class="dash-card">
+  <div class="dash-card-header">
+    <span class="dash-card-title">🧠 All Skills <span style="color:var(--text-dim);font-weight:400">({{ skills|length }})</span></span>
+  </div>
+  {% if skills %}
+  <div style="overflow-x:auto">
+    <table class="dash-table">
+      <thead><tr>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Proficiency</th>
+        <th>Order</th>
+        <th style="text-align:right">Actions</th>
+      </tr></thead>
+      <tbody>
+        {% for skill in skills %}
+        <tr>
+          <td class="td-title">{{ skill.icon }} {{ skill.name }}</td>
+          <td><span class="badge badge-blue">{{ skill.get_category_display }}</span></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:0.625rem">
+              <div style="flex:1;height:5px;background:var(--border);border-radius:3px;min-width:80px;overflow:hidden">
+                <div style="height:100%;width:{{ skill.proficiency }}%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px"></div>
+              </div>
+              <span style="font-size:0.75rem;font-family:var(--mono);color:var(--text-muted);white-space:nowrap">{{ skill.proficiency }}%</span>
+            </div>
+          </td>
+          <td style="font-family:var(--mono);color:var(--text-dim)">{{ skill.order }}</td>
+          <td>
+            <div class="td-actions">
+              <a href="{% url 'dashboard_skill_edit' skill.pk %}" class="action-btn">Edit</a>
+              <form method="POST" action="{% url 'dashboard_skill_delete' skill.pk %}" style="display:inline"
+                onsubmit="return confirm('Delete &quot;{{ skill.name }}&quot;?')">
+                {% csrf_token %}
+                <button type="submit" class="action-btn action-btn-danger">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">🧠</div>
+    <p>No skills added yet. Skills show as animated bars on your homepage.</p>
+    <a href="{% url 'dashboard_skill_add' %}" class="action-btn action-btn-primary">+ Add Skill</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

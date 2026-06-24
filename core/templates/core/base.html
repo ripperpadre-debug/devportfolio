@@ -262,6 +262,9 @@
         <li><a href="/projects/" {% if request.resolver_match.url_name == 'projects' or request.resolver_match.url_name == 'project_detail' %}class="active"{% endif %}>Projects</a></li>
         <li><a href="/blog/" {% if request.resolver_match.url_name == 'blog' or request.resolver_match.url_name == 'blog_detail' %}class="active"{% endif %}>Blog</a></li>
         <li><a href="/contact/" class="nav-cta" {% if request.resolver_match.url_name == 'contact' %}style="background:#fff!important"{% endif %}>Hire Me</a></li>
+        {% if request.user.is_staff %}
+        <li><a href="/dashboard/" style="color:var(--accent2)!important">⚡ Dashboard</a></li>
+        {% endif %}
       </ul>
       <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
         <span></span><span></span><span></span>
@@ -290,7 +293,7 @@
           <a href="/projects/">Projects</a>
           <a href="/blog/">Blog</a>
           <a href="/contact/">Contact</a>
-          {% if request.user.is_staff %}<a href="/admin/">Admin</a>{% endif %}
+          {% if request.user.is_staff %}<a href="/dashboard/">Dashboard</a>{% endif %}
         </nav>
         <p>© {% now "Y" %} {{ site_profile.name|default:"Alex Kimani" }} — All rights reserved</p>
       </div>

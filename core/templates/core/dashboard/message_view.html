@@ -1,0 +1,49 @@
+{% extends 'core/dashboard/base.html' %}
+{% block title %}Message from {{ msg.name }}{% endblock %}
+{% block page_title %}Message from {{ msg.name }}{% endblock %}
+{% block nav_messages %}active{% endblock %}
+
+{% block content %}
+<div style="max-width:680px">
+  <div class="dash-card" style="margin-bottom:1rem">
+    <div class="dash-card-header">
+      <div>
+        <span class="dash-card-title">💬 {{ msg.subject|default:"(no subject)" }}</span>
+        <div style="font-size:0.78rem;color:var(--text-dim);margin-top:0.25rem;font-family:var(--mono)">
+          {{ msg.sent_at|date:"F d, Y — g:i A" }}
+        </div>
+      </div>
+      <a href="{% url 'dashboard_messages' %}" class="action-btn">← Back</a>
+    </div>
+    <div class="dash-card-body">
+      <!-- Sender info -->
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;flex:1;min-width:180px">
+          <p style="font-size:0.68rem;font-family:var(--mono);color:var(--text-dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:0.3rem">From</p>
+          <p style="font-weight:600;color:var(--text)">{{ msg.name }}</p>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;flex:1;min-width:180px">
+          <p style="font-size:0.68rem;font-family:var(--mono);color:var(--text-dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:0.3rem">Email</p>
+          <a href="mailto:{{ msg.email }}" style="color:var(--accent);font-weight:500;text-decoration:none">{{ msg.email }}</a>
+        </div>
+      </div>
+
+      <!-- Message body -->
+      <div style="color:var(--text-muted);line-height:1.85;font-size:0.95rem;white-space:pre-wrap">{{ msg.message }}</div>
+
+      <!-- Actions -->
+      <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1.75rem;padding-top:1.25rem;border-top:1px solid var(--border)">
+        <a href="mailto:{{ msg.email }}?subject=Re: {{ msg.subject }}" class="btn-save" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem">
+          📧 Reply via Email
+        </a>
+        <a href="{% url 'dashboard_messages' %}" class="btn-cancel" style="display:inline-flex;align-items:center">← Back to Messages</a>
+        <form method="POST" action="{% url 'dashboard_message_delete' msg.pk %}" style="margin-left:auto"
+          onsubmit="return confirm('Delete this message?')">
+          {% csrf_token %}
+          <button type="submit" class="action-btn action-btn-danger" style="padding:0.6rem 1rem">Delete Message</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

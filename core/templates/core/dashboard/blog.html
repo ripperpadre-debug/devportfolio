@@ -1,0 +1,77 @@
+{% extends 'core/dashboard/base.html' %}
+{% block title %}Blog Posts{% endblock %}
+{% block page_title %}Blog Posts{% endblock %}
+{% block nav_blog %}active{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'dashboard_post_add' %}" class="topbar-btn topbar-btn-primary">+ Write Post</a>
+{% endblock %}
+
+{% block content %}
+<div class="dash-card">
+  <div class="dash-card-header">
+    <span class="dash-card-title">✍️ All Posts <span style="color:var(--text-dim);font-weight:400">({{ posts|length }})</span></span>
+  </div>
+  {% if posts %}
+  <div style="overflow-x:auto">
+    <table class="dash-table">
+      <thead><tr>
+        <th>Title</th>
+        <th>Tags</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th style="text-align:right">Actions</th>
+      </tr></thead>
+      <tbody>
+        {% for post in posts %}
+        <tr>
+          <td>
+            <div class="td-title">{{ post.title|truncatechars:45 }}</div>
+            {% if post.excerpt %}<div style="font-size:0.75rem;color:var(--text-dim);margin-top:2px">{{ post.excerpt|truncatechars:60 }}</div>{% endif %}
+          </td>
+          <td>
+            <div style="display:flex;gap:0.3rem;flex-wrap:wrap">
+              {% for tag in post.get_tags_list|slice:":3" %}
+              <span class="badge badge-blue">{{ tag }}</span>
+              {% endfor %}
+            </div>
+          </td>
+          <td>
+            {% if post.published %}
+              <span class="badge badge-green">● Published</span>
+            {% else %}
+              <span class="badge badge-gray">● Draft</span>
+            {% endif %}
+          </td>
+          <td style="font-size:0.78rem;font-family:var(--mono);color:var(--text-dim);white-space:nowrap">
+            {{ post.created_at|date:"M d, Y" }}
+          </td>
+          <td>
+            <div class="td-actions">
+              <a href="{% url 'dashboard_post_toggle' post.pk %}" class="action-btn {% if post.published %}action-btn-danger{% else %}action-btn-green{% endif %}">
+                {% if post.published %}Unpublish{% else %}Publish{% endif %}
+              </a>
+              <a href="{% url 'dashboard_post_edit' post.pk %}" class="action-btn">Edit</a>
+              {% if post.published %}
+              <a href="/blog/{{ post.slug }}/" target="_blank" class="action-btn">↗</a>
+              {% endif %}
+              <form method="POST" action="{% url 'dashboard_post_delete' post.pk %}" style="display:inline"
+                onsubmit="return confirm('Delete &quot;{{ post.title }}&quot;? This cannot be undone.')">
+                {% csrf_token %}
+                <button type="submit" class="action-btn action-btn-danger">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">✍️</div>
+    <p>No posts yet. Share your thoughts, tutorials, or project write-ups with the world.</p>
+    <a href="{% url 'dashboard_post_add' %}" class="action-btn action-btn-primary">+ Write Your First Post</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

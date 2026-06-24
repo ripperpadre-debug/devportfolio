@@ -1,0 +1,62 @@
+{% extends 'core/dashboard/base.html' %}
+{% block title %}Projects{% endblock %}
+{% block page_title %}Projects{% endblock %}
+{% block nav_projects %}active{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'dashboard_project_add' %}" class="topbar-btn topbar-btn-primary">+ Add Project</a>
+{% endblock %}
+
+{% block content %}
+<div class="dash-card">
+  <div class="dash-card-header">
+    <span class="dash-card-title">💼 All Projects <span style="color:var(--text-dim);font-weight:400">({{ projects|length }})</span></span>
+  </div>
+  {% if projects %}
+  <div style="overflow-x:auto">
+    <table class="dash-table">
+      <thead><tr>
+        <th>Title</th>
+        <th>Category</th>
+        <th>Status</th>
+        <th>Featured</th>
+        <th style="text-align:right">Actions</th>
+      </tr></thead>
+      <tbody>
+        {% for p in projects %}
+        <tr>
+          <td>
+            <div class="td-title">{{ p.title }}</div>
+            {% if p.tagline %}<div style="font-size:0.75rem;color:var(--text-dim);margin-top:2px">{{ p.tagline|truncatechars:50 }}</div>{% endif %}
+          </td>
+          <td><span class="badge badge-blue">{{ p.get_category_display }}</span></td>
+          <td>
+            {% if p.status == 'live' %}<span class="badge badge-green">● Live</span>
+            {% elif p.status == 'in_progress' %}<span class="badge badge-yellow">● In Progress</span>
+            {% else %}<span class="badge badge-gray">● Archived</span>{% endif %}
+          </td>
+          <td>{% if p.featured %}<span class="badge badge-purple">★ Yes</span>{% else %}<span style="color:var(--text-dim);font-size:0.78rem">—</span>{% endif %}</td>
+          <td>
+            <div class="td-actions">
+              {% if p.live_url %}<a href="{{ p.live_url }}" target="_blank" class="action-btn action-btn-green">↗</a>{% endif %}
+              <a href="{% url 'dashboard_project_edit' p.pk %}" class="action-btn">Edit</a>
+              <form method="POST" action="{% url 'dashboard_project_delete' p.pk %}" style="display:inline"
+                onsubmit="return confirm('Delete &quot;{{ p.title }}&quot;? This cannot be undone.')">
+                {% csrf_token %}
+                <button type="submit" class="action-btn action-btn-danger">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">💻</div>
+    <p>No projects yet. Add your first one to show it on the portfolio.</p>
+    <a href="{% url 'dashboard_project_add' %}" class="action-btn action-btn-primary">+ Add Project</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
