@@ -1,0 +1,92 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ project.title }} — Portfolio{% endblock %}
+{% block extra_head %}
+<style>
+  .project-hero { padding: 4rem 0; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .project-cover { width: 100%; max-height: 480px; object-fit: cover; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 2rem; }
+  .project-grid { display: grid; grid-template-columns: 1fr 320px; gap: 3rem; }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; }
+  .sidebar-card h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-family: var(--font-mono); margin-bottom: 1rem; }
+  .sidebar-row { display: flex; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+  .sidebar-row:last-child { border: none; }
+  .sidebar-label { color: var(--text-muted); }
+  .content-body { color: var(--text-muted); line-height: 1.9; font-size: 1rem; }
+  .content-body p { margin-bottom: 1rem; }
+  @media(max-width:900px){ .project-grid { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+{% block content %}
+<div class="project-hero">
+  <div class="container">
+    <a href="/projects/" style="color:var(--text-muted);text-decoration:none;font-size:0.9rem">← Back to Projects</a>
+    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;margin:1rem 0">
+      <span class="tag">{{ project.get_category_display }}</span>
+      <span class="tag {% if project.status == 'live' %}tag-accent{% endif %}">{{ project.get_status_display }}</span>
+      {% if project.featured %}<span class="tag" style="color:#A78BFA">★ Featured</span>{% endif %}
+    </div>
+    <h1>{{ project.title }}</h1>
+    {% if project.tagline %}<p style="color:var(--accent);font-size:1.1rem;margin-top:0.75rem">{{ project.tagline }}</p>{% endif %}
+  </div>
+</div>
+
+<section>
+  <div class="container">
+    {% if project.image %}
+    <img src="{{ project.image.url }}" alt="{{ project.title }}" class="project-cover">
+    {% endif %}
+
+    <div class="project-grid">
+      <div>
+        <div class="content-body">{{ project.description|linebreaks }}</div>
+      </div>
+
+      <div>
+        <div class="sidebar-card" style="margin-bottom:1.5rem">
+          <h3>Project Info</h3>
+          <div class="sidebar-row"><span class="sidebar-label">Category</span><span>{{ project.get_category_display }}</span></div>
+          <div class="sidebar-row"><span class="sidebar-label">Status</span><span>{{ project.get_status_display }}</span></div>
+          <div class="sidebar-row"><span class="sidebar-label">Date</span><span>{{ project.created_at|date:"M Y" }}</span></div>
+        </div>
+
+        {% if project.get_tech_list %}
+        <div class="sidebar-card" style="margin-bottom:1.5rem">
+          <h3>Tech Stack</h3>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem">
+            {% for tech in project.get_tech_list %}
+            <span class="tag">{{ tech }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="sidebar-card">
+          <h3>Links</h3>
+          <div style="display:flex;flex-direction:column;gap:0.75rem">
+            {% if project.live_url %}
+            <a href="{{ project.live_url }}" class="btn btn-primary" target="_blank">View Live ↗</a>
+            {% endif %}
+            {% if project.github_url %}
+            <a href="{{ project.github_url }}" class="btn btn-outline" target="_blank">GitHub Repo</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% if related %}
+    <div style="margin-top:4rem">
+      <h2 style="margin-bottom:1.5rem">Related Projects</h2>
+      <div class="grid-3">
+        {% for p in related %}
+        <a href="/projects/{{ p.slug }}/" class="card" style="text-decoration:none;padding:1.5rem">
+          <span class="tag" style="margin-bottom:0.75rem;display:inline-block">{{ p.get_category_display }}</span>
+          <h3 style="font-size:1rem;margin-bottom:0.5rem">{{ p.title }}</h3>
+          <p style="color:var(--text-muted);font-size:0.85rem">{{ p.description|truncatewords:15 }}</p>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

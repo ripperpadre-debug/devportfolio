@@ -1,0 +1,70 @@
+{% extends 'core/base.html' %}
+{% block title %}Blog — Portfolio{% endblock %}
+{% block extra_head %}
+<style>
+  .page-hero { padding: 4rem 0 3rem; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .tag-filter { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+  .tag-btn { padding: 0.4rem 0.9rem; border-radius: 100px; background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); font-size: 0.8rem; text-decoration: none; transition: all var(--transition); }
+  .tag-btn:hover, .tag-btn.active { background: rgba(0,212,255,0.1); border-color: var(--accent); color: var(--accent); }
+  .blog-card { padding: 2rem; }
+  .blog-cover { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1.25rem; background: var(--surface2); }
+  .blog-meta { display: flex; gap: 1rem; font-size: 0.78rem; color: var(--text-dim); font-family: var(--font-mono); margin-bottom: 0.75rem; }
+  .blog-title { font-size: 1.15rem; font-weight: 700; color: var(--text); text-decoration: none; display: block; margin-bottom: 0.6rem; transition: color var(--transition); }
+  .blog-title:hover { color: var(--accent); }
+  .blog-excerpt { color: var(--text-muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1rem; }
+  .read-more { color: var(--accent); text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+  .read-more:hover { text-decoration: underline; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+  <div class="container">
+    <p class="section-label">Writing</p>
+    <h1>Blog</h1>
+    <p style="color:var(--text-muted);margin-top:0.75rem;max-width:500px">Thoughts on software engineering, data science, and the craft of building things.</p>
+  </div>
+</div>
+
+<section>
+  <div class="container">
+    {% if all_tags %}
+    <div class="tag-filter">
+      <a href="/blog/" class="tag-btn {% if not active_tag %}active{% endif %}">All</a>
+      {% for tag in all_tags %}
+      <a href="/blog/?tag={{ tag }}" class="tag-btn {% if active_tag == tag %}active{% endif %}">{{ tag }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="grid-3">
+      {% for post in posts %}
+      <div class="card blog-card reveal">
+        {% if post.cover_image %}
+        <img src="{{ post.cover_image.url }}" alt="{{ post.title }}" class="blog-cover">
+        {% endif %}
+        <div class="blog-meta">
+          <span>{{ post.created_at|date:"M d, Y" }}</span>
+          <span>·</span>
+          <span>{{ post.content|wordcount }} word read</span>
+        </div>
+        <a href="/blog/{{ post.slug }}/" class="blog-title">{{ post.title }}</a>
+        <p class="blog-excerpt">{{ post.excerpt|default:post.content|truncatewords:25 }}</p>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:1rem">
+          {% for tag in post.get_tags_list %}
+          <a href="/blog/?tag={{ tag }}" class="tag tag-accent">{{ tag }}</a>
+          {% endfor %}
+        </div>
+        <a href="/blog/{{ post.slug }}/" class="read-more">Read more →</a>
+      </div>
+      {% empty %}
+      <div style="grid-column:1/-1;text-align:center;padding:4rem;color:var(--text-muted)">
+        <p style="font-size:3rem;margin-bottom:1rem">✍️</p>
+        <p>No posts yet.</p>
+        <a href="/admin/core/blogpost/add/" class="btn btn-primary" style="margin-top:1.5rem">Write Your First Post</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,308 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ profile.name }} — Full Stack Developer & Data Scientist{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* HERO */
+  .hero {
+    min-height: 100vh; display: flex; align-items: center;
+    position: relative; overflow: hidden; padding: 0;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse 80% 60% at 60% 40%, rgba(124,58,237,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 20% 80%, rgba(0,212,255,0.08) 0%, transparent 60%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(30,48,80,0.3) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(30,48,80,0.3) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 2rem; width: 100%; }
+  .hero-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.4rem 1rem; border-radius: 100px;
+    background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.25);
+    font-size: 0.8rem; color: var(--accent); font-family: var(--font-mono);
+    margin-bottom: 1.5rem;
+  }
+  .hero-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.5)} }
+
+  .hero h1 { margin-bottom: 1.25rem; }
+  .hero h1 .name { display: block; color: var(--text); }
+  .hero h1 .role { display: block; font-size: 0.6em; color: var(--text-muted); font-weight: 400; margin-top: 0.25rem; }
+
+  .hero-desc { font-size: 1.05rem; color: var(--text-muted); margin-bottom: 2rem; max-width: 480px; line-height: 1.75; }
+
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem; }
+
+  .hero-stats { display: flex; gap: 2rem; }
+  .stat { text-align: center; }
+  .stat-num { font-size: 1.8rem; font-weight: 700; color: var(--accent); font-family: var(--font-mono); }
+  .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+  /* Avatar card */
+  .hero-visual { display: flex; justify-content: center; }
+  .avatar-wrapper {
+    position: relative; width: 340px; height: 340px;
+  }
+  .avatar-ring {
+    position: absolute; inset: -16px;
+    border-radius: 50%; border: 2px solid transparent;
+    background: linear-gradient(135deg, var(--accent), var(--accent2), transparent) border-box;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: destination-out; mask-composite: exclude;
+    animation: spin 8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .avatar-img {
+    width: 100%; height: 100%; border-radius: 50%;
+    object-fit: cover; border: 3px solid var(--border);
+    background: var(--surface);
+  }
+  .avatar-placeholder {
+    width: 100%; height: 100%; border-radius: 50%;
+    background: var(--surface2); border: 3px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 5rem;
+  }
+  .floating-badge {
+    position: absolute; padding: 0.6rem 1rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; font-size: 0.8rem; font-weight: 600;
+    display: flex; align-items: center; gap: 0.5rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .fb-1 { top: 10px; right: -30px; }
+  .fb-2 { bottom: 30px; left: -30px; }
+  .fb-3 { bottom: -10px; right: 10px; }
+
+  /* SKILLS */
+  .skills-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .skill-category { margin-bottom: 2.5rem; }
+  .skill-cat-title { font-size: 0.8rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem; font-family: var(--font-mono); }
+  .skill-bars { display: flex; flex-direction: column; gap: 0.75rem; }
+  .skill-bar-row { display: flex; align-items: center; gap: 1rem; }
+  .skill-bar-name { width: 120px; font-size: 0.85rem; color: var(--text); flex-shrink: 0; }
+  .skill-bar-track { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .skill-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 1.2s cubic-bezier(0.4,0,0.2,1); width: 0; }
+  .skill-bar-pct { width: 36px; font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); text-align: right; }
+  .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
+
+  /* PROJECT CARDS */
+  .project-card { display: flex; flex-direction: column; }
+  .project-img { height: 200px; object-fit: cover; width: 100%; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+  .project-img img { width: 100%; height: 100%; object-fit: cover; }
+  .project-body { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
+  .project-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+  .project-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .project-desc { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; flex: 1; margin-bottom: 1rem; }
+  .project-actions { display: flex; gap: 0.75rem; margin-top: auto; }
+  .project-status { padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.7rem; font-family: var(--font-mono); font-weight: 600; }
+  .status-live { background: rgba(16,185,129,0.15); color: var(--accent3); }
+  .status-in_progress { background: rgba(251,191,36,0.15); color: #FBBF24; }
+  .status-archived { background: rgba(107,139,174,0.15); color: var(--text-muted); }
+  .featured-badge { background: rgba(124,58,237,0.15); color: #A78BFA; border: 1px solid rgba(124,58,237,0.3); }
+
+  /* BLOG CARDS */
+  .blog-card { padding: 1.75rem; }
+  .blog-date { font-size: 0.75rem; color: var(--text-dim); font-family: var(--font-mono); margin-bottom: 0.75rem; }
+  .blog-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text); text-decoration: none; display: block; transition: color var(--transition); }
+  .blog-title:hover { color: var(--accent); }
+  .blog-excerpt { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem; }
+  .blog-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+  /* CTA BANNER */
+  .cta-banner {
+    text-align: center; padding: 5rem 2rem;
+    background: linear-gradient(135deg, rgba(0,212,255,0.05), rgba(124,58,237,0.05));
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  }
+  .cta-banner h2 { margin-bottom: 1rem; }
+  .cta-banner p { color: var(--text-muted); max-width: 500px; margin: 0 auto 2rem; }
+
+  @media(max-width:768px){
+    .hero-inner { grid-template-columns: 1fr; text-align: center; }
+    .hero-visual { display: none; }
+    .hero-stats { justify-content: center; }
+    .hero-actions { justify-content: center; }
+    .hero-desc { margin: 0 auto 2rem; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-badge">Available for opportunities</div>
+        <h1>
+          <span class="name">{{ profile.name|default:"Your Name" }}</span>
+          <span class="role">Full Stack Developer · Data Scientist · Problem Solver</span>
+        </h1>
+        <p class="hero-desc">{{ profile.bio|default:"I build scalable web applications, machine learning pipelines, and data-driven products. Turning complex problems into elegant solutions." }}</p>
+        <div class="hero-actions">
+          <a href="/projects/" class="btn btn-primary">View My Work →</a>
+          <a href="/contact/" class="btn btn-outline">Get In Touch</a>
+          {% if profile.resume %}<a href="{{ profile.resume.url }}" class="btn btn-ghost" target="_blank">↓ Resume</a>{% endif %}
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><div class="stat-num">{{ profile.years_experience|default:"3" }}+</div><div class="stat-label">Years Exp.</div></div>
+          <div class="stat"><div class="stat-num">{{ profile.projects_count|default:"20" }}+</div><div class="stat-label">Projects</div></div>
+          <div class="stat"><div class="stat-num">{{ profile.clients_count|default:"10" }}+</div><div class="stat-label">Clients</div></div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="avatar-wrapper">
+          <div class="avatar-ring"></div>
+          {% if profile.avatar %}
+            <img src="{{ profile.avatar.url }}" alt="{{ profile.name }}" class="avatar-img">
+          {% else %}
+            <div class="avatar-placeholder">👨‍💻</div>
+          {% endif %}
+          <div class="floating-badge fb-1">🚀 Full Stack</div>
+          <div class="floating-badge fb-2">🤖 ML / AI</div>
+          <div class="floating-badge fb-3">📊 Data Science</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section class="skills-section">
+  <div class="container">
+    <p class="section-label">What I Know</p>
+    <h2 style="margin-bottom:3rem">Skills &amp; Technologies</h2>
+    <div class="skills-grid" id="skillsGrid">
+      {% for category, skills in skill_categories.items %}
+      <div class="skill-category reveal">
+        <div class="skill-cat-title">{{ category }}</div>
+        <div class="skill-bars">
+          {% for skill in skills %}
+          <div class="skill-bar-row">
+            <span class="skill-bar-name">{{ skill.name }}</span>
+            <div class="skill-bar-track">
+              <div class="skill-bar-fill" data-width="{{ skill.proficiency }}"></div>
+            </div>
+            <span class="skill-bar-pct">{{ skill.proficiency }}%</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% empty %}
+      <div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:2rem">
+        <p>Add skills via the <a href="/admin/" style="color:var(--accent)">Admin panel</a></p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section>
+  <div class="container">
+    <p class="section-label">What I've Built</p>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2.5rem;flex-wrap:wrap;gap:1rem">
+      <h2>Featured Projects</h2>
+      <a href="/projects/" class="btn btn-outline">All Projects →</a>
+    </div>
+    <div class="grid-3">
+      {% for project in all_projects %}
+      <div class="card project-card reveal">
+        <div class="project-img">
+          {% if project.image %}<img src="{{ project.image.url }}" alt="{{ project.title }}">{% else %}💻{% endif %}
+        </div>
+        <div class="project-body">
+          <div class="project-meta">
+            <span class="tag">{{ project.get_category_display }}</span>
+            <span class="project-status status-{{ project.status }}">{{ project.get_status_display }}</span>
+            {% if project.featured %}<span class="tag featured-badge">★ Featured</span>{% endif %}
+          </div>
+          <h3 class="project-title">{{ project.title }}</h3>
+          <p class="project-desc">{{ project.description|truncatewords:25 }}</p>
+          <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:1rem">
+            {% for tech in project.get_tech_list %}
+            <span class="tag">{{ tech }}</span>
+            {% endfor %}
+          </div>
+          <div class="project-actions">
+            <a href="/projects/{{ project.slug }}/" class="btn btn-primary" style="flex:1;justify-content:center">View Project</a>
+            {% if project.github_url %}<a href="{{ project.github_url }}" class="btn btn-outline" target="_blank">GitHub</a>{% endif %}
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:3rem">
+        <p>No projects yet. <a href="/admin/core/project/add/" style="color:var(--accent)">Add your first project →</a></p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- BLOG -->
+{% if recent_posts %}
+<section style="background:var(--surface);border-top:1px solid var(--border)">
+  <div class="container">
+    <p class="section-label">Thoughts &amp; Insights</p>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2.5rem;flex-wrap:wrap;gap:1rem">
+      <h2>Latest Articles</h2>
+      <a href="/blog/" class="btn btn-outline">All Posts →</a>
+    </div>
+    <div class="grid-3">
+      {% for post in recent_posts %}
+      <div class="card blog-card reveal">
+        <div class="blog-date">{{ post.created_at|date:"M d, Y" }}</div>
+        <a href="/blog/{{ post.slug }}/" class="blog-title">{{ post.title }}</a>
+        <p class="blog-excerpt">{{ post.excerpt|truncatewords:20 }}</p>
+        <div class="blog-tags">
+          {% for tag in post.get_tags_list %}
+          <span class="tag tag-accent">{{ tag }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- CTA -->
+<div class="cta-banner">
+  <div class="container">
+    <p class="section-label">Let's Work Together</p>
+    <h2>Have a project in mind?</h2>
+    <p>I'm open to freelance projects, full-time roles, and interesting collaborations. Let's build something great.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/contact/" class="btn btn-primary">Start a Conversation →</a>
+      {% if profile.github %}<a href="{{ profile.github }}" class="btn btn-outline" target="_blank">GitHub Profile</a>{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Animate skill bars when visible
+  const barObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.skill-bar-fill').forEach(bar => {
+          bar.style.width = bar.dataset.width + '%';
+        });
+      }
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.skill-category').forEach(el => barObserver.observe(el));
+</script>
+{% endblock %}
