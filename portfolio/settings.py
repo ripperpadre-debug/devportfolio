@@ -1,8 +1,13 @@
 from pathlib import Path
 import os
+import shutil
+import tempfile
 from urllib.parse import unquote, urlparse
 
+from dotenv import load_dotenv
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')
 SECRET_KEY = 'django-insecure-change-this-in-production-use-env-variable'
 DEBUG = True
 ALLOWED_HOSTS = ['*']
@@ -62,16 +67,51 @@ def sqlite_sync_source_path():
     return source_path
 
 
+def _sqlite_db_path(candidate_path):
+    path = Path(candidate_path).expanduser()
+    if path.exists() and not os.access(path.parent, os.W_OK):
+        fallback_path = Path(tempfile.gettempdir()) / path.name
+        if path.exists():
+            try:
+                shutil.copy2(path, fallback_path)
+            except OSError:
+                pass
+        return fallback_path
+
+    if not path.exists():
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.touch()
+            path.unlink(missing_ok=True)
+        except OSError:
+            fallback_path = Path(tempfile.gettempdir()) / path.name
+            if path.exists():
+                try:
+                    shutil.copy2(path, fallback_path)
+                except OSError:
+                    pass
+            return fallback_path
+
+    return path
+
+
 def sqlite_database_config():
+    configured_path = os.environ.get('SQLITE_DB_PATH')
+    if configured_path:
+        db_path = _sqlite_db_path(configured_path)
+    else:
+        db_path = _sqlite_db_path(BASE_DIR / 'db.sqlite3')
+
+    db_path.parent.mkdir(parents=True, exist_ok=True)
     return {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': db_path,
     }
 
 
 def postgres_database_config_from_url(database_url):
     parsed = urlparse(database_url)
-    return {
+    config = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': unquote(parsed.path.lstrip('/')),
         'USER': unquote(parsed.username or ''),
@@ -79,6 +119,16 @@ def postgres_database_config_from_url(database_url):
         'HOST': parsed.hostname or '',
         'PORT': str(parsed.port or ''),
     }
+    query_params = {}
+    for item in parsed.query.split('&'):
+        if '=' in item:
+            key, value = item.split('=', 1)
+            query_params[key] = unquote(value)
+    if 'sslmode' in query_params:
+        config['OPTIONS'] = {'sslmode': query_params['sslmode']}
+    elif parsed.hostname and '.neon.tech' in parsed.hostname:
+        config['OPTIONS'] = {'sslmode': 'require'}
+    return config
 
 
 def postgres_database_config_from_env():
