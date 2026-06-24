@@ -91,4 +91,11 @@ TWITTER_ACCESS_SECRET = os.environ.get('TWITTER_ACCESS_SECRET', '')
 LINKEDIN_ACCESS_TOKEN = os.environ.get('LINKEDIN_ACCESS_TOKEN', '')
 LINKEDIN_PERSON_ID = os.environ.get('LINKEDIN_PERSON_ID', '')
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('GMAIL_APP_PASSWORD', '')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+NOTIFY_EMAIL = os.environ.get('NOTIFY_EMAIL', EMAIL_HOST_USER)

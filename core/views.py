@@ -6,6 +6,7 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib.admin.views.decorators import staff_member_required
+from django.core.mail import send_mail
 from .models import Profile, Project, BlogPost, Skill, ContactMessage, SocialShareLog
 
 
@@ -74,6 +75,27 @@ def contact(request):
         message = request.POST.get('message', '').strip()
         if name and email and message:
             ContactMessage.objects.create(name=name, email=email, subject=subject, message=message)
+            # Email notification
+            try:
+                notify_email = getattr(settings, 'NOTIFY_EMAIL', '')
+                if notify_email:
+                    send_mail(
+                        subject=f"📬 New contact: {subject or '(no subject)'} — from {name}",
+                        message=(
+                            f"You have a new message on your portfolio!\n\n"
+                            f"From:    {name}\n"
+                            f"Email:   {email}\n"
+                            f"Subject: {subject or '(none)'}\n\n"
+                            f"Message:\n{message}\n\n"
+                            f"---\nReply directly to: {email}\n"
+                            f"View in dashboard: /dashboard/messages/"
+                        ),
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[notify_email],
+                        fail_silently=True,
+                    )
+            except Exception:
+                pass
             messages.success(request, "Message sent! I'll get back to you soon.")
             return redirect('contact')
         else:
