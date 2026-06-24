@@ -39,6 +39,11 @@ def dashboard_login(request):
         user = authenticate(request, username=username, password=password)
         if user and user.is_staff:
             login(request, user)
+            unread = ContactMessage.objects.filter(read=False).count()
+            if unread:
+                messages.success(request, f'👋 Welcome back! You have {unread} unread message{"s" if unread != 1 else ""}.')
+            else:
+                messages.success(request, f'👋 Welcome back, {user.username}!')
             return redirect(request.GET.get('next', '/dashboard/'))
         error = 'Invalid username or password.'
     return render(request, 'core/dashboard/login.html', {'error': error})

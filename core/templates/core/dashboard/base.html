@@ -281,6 +281,28 @@
     .empty-state-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
     .empty-state p { font-size: 0.9rem; margin-bottom: 1.25rem; color: var(--text-muted); }
 
+    /* ── NOTIFICATION BELL ── */
+    .notif-bell {
+      position: relative; display: flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px; border-radius: 8px; text-decoration: none;
+      background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3);
+      transition: all var(--tr); animation: bellPulse 2.5s ease-in-out infinite;
+    }
+    .notif-bell:hover { background: rgba(239,68,68,0.22); border-color: rgba(239,68,68,0.6); }
+    .notif-icon { font-size: 1rem; line-height: 1; }
+    .notif-dot {
+      position: absolute; top: -5px; right: -5px;
+      background: var(--danger); color: #fff;
+      font-size: 0.6rem; font-weight: 700; font-family: var(--mono);
+      min-width: 17px; height: 17px; border-radius: 100px;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 3px; border: 2px solid var(--bg);
+    }
+    @keyframes bellPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+
     /* ── MOBILE OVERLAY ── */
     .sidebar-overlay {
       display: none; position: fixed; inset: 0; z-index: 199;
@@ -374,6 +396,12 @@
       </div>
       <div class="topbar-right">
         {% block topbar_actions %}{% endblock %}
+        {% if unread_count %}
+        <a href="{% url 'dashboard_messages' %}" class="notif-bell" title="{{ unread_count }} unread message{{ unread_count|pluralize }}">
+          <span class="notif-icon">🔔</span>
+          <span class="notif-dot">{{ unread_count }}</span>
+        </a>
+        {% endif %}
         <a href="/" target="_blank" class="topbar-btn topbar-btn-outline">↗ View Site</a>
       </div>
     </header>
