@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+from urllib.parse import unquote, urlparse
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-change-this-in-production-use-env-variable'
@@ -53,11 +54,66 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'portfolio.wsgi.application'
 
-DATABASES = {
-    'default': {
+
+def sqlite_sync_source_path():
+    source_path = Path(os.environ.get('SQLITE_SYNC_SOURCE', BASE_DIR / 'db.sqlite3'))
+    if not source_path.is_absolute():
+        source_path = BASE_DIR / source_path
+    return source_path
+
+
+def sqlite_database_config():
+    return {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+
+
+def postgres_database_config_from_url(database_url):
+    parsed = urlparse(database_url)
+    return {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': unquote(parsed.path.lstrip('/')),
+        'USER': unquote(parsed.username or ''),
+        'PASSWORD': unquote(parsed.password or ''),
+        'HOST': parsed.hostname or '',
+        'PORT': str(parsed.port or ''),
+    }
+
+
+def postgres_database_config_from_env():
+    database_name = os.environ.get('POSTGRES_DB') or os.environ.get('PGDATABASE')
+    if not database_name:
+        return None
+
+    return {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': database_name,
+        'USER': os.environ.get('POSTGRES_USER') or os.environ.get('PGUSER', ''),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD') or os.environ.get('PGPASSWORD', ''),
+        'HOST': os.environ.get('POSTGRES_HOST') or os.environ.get('PGHOST', 'localhost'),
+        'PORT': os.environ.get('POSTGRES_PORT') or os.environ.get('PGPORT', '5432'),
+    }
+
+
+def database_config():
+    database_url = os.environ.get('DATABASE_URL')
+    if database_url:
+        return postgres_database_config_from_url(database_url)
+
+    postgres_config = postgres_database_config_from_env()
+    if postgres_config:
+        return postgres_config
+
+    return sqlite_database_config()
+
+
+DATABASES = {
+    'default': database_config(),
+    'sqlite_source': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': sqlite_sync_source_path(),
+    },
 }
 
 AUTH_PASSWORD_VALIDATORS = [
