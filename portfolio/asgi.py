@@ -9,8 +9,10 @@ https://docs.djangoproject.com/en/6.0/howto/deployment/asgi/
 
 import os
 
-from django.core.asgi import get_asgi_application
-
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'portfolio.settings')
 
+from django.core.asgi import get_asgi_application
+from portfolio.startup import run_startup_migrations
+
 application = get_asgi_application()
+run_startup_migrations()
