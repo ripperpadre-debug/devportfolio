@@ -16,3 +16,7 @@ from portfolio.startup import run_startup_tasks
 
 application = get_asgi_application()
 run_startup_tasks()
+from portfolio.startup import run_startup_migrations
+
+application = get_asgi_application()
+run_startup_migrations()
