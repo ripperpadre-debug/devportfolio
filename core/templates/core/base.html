@@ -69,6 +69,8 @@
           <a href="/projects/">Projects</a>
           <a href="/blog/">Blog</a>
           <a href="/contact/">Contact</a>
+          <a href="{% url 'terms' %}">Terms</a>
+          <a href="{% url 'privacy' %}">Privacy</a>
           {% if request.user.is_staff %}<a href="/dashboard/">Dashboard</a>{% endif %}
         </nav>
         <p>© {% now "Y" %} {{ site_profile.name|default:"Alex Kimani" }} — All rights reserved</p>
@@ -127,5 +129,29 @@
     });
   </script>
   {% block extra_js %}{% endblock %}
+
+  <!-- Cookie Consent Banner -->
+  <div id="cookieBanner" role="dialog" aria-label="Cookie consent" aria-describedby="cookieBannerText">
+    <div class="cookie-content">
+      <p id="cookieBannerText">This site uses cookies to improve your experience. <a href="{% url 'privacy' %}">Learn more</a>.</p>
+      <button id="cookieAccept" class="cookie-btn" aria-label="Accept cookies">Got it</button>
+    </div>
+  </div>
+  <script>
+    (function() {
+      var banner = document.getElementById('cookieBanner');
+      var accept = document.getElementById('cookieAccept');
+      if (localStorage.getItem('cookieConsent')) {
+        banner.style.display = 'none';
+      } else {
+        setTimeout(function() { banner.classList.add('show'); }, 500);
+        accept.addEventListener('click', function() {
+          localStorage.setItem('cookieConsent', 'accepted');
+          banner.classList.remove('show');
+          setTimeout(function() { banner.style.display = 'none'; }, 400);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

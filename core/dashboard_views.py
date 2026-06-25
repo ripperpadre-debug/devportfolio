@@ -6,8 +6,8 @@ from django.utils.text import slugify
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 
-from .models import Profile, Project, Skill, BlogPost, ContactMessage
-from .forms import ProfileForm, ProjectForm, SkillForm, BlogPostForm
+from .models import Profile, Project, Skill, BlogPost, ContactMessage, LegalPage
+from .forms import ProfileForm, ProjectForm, SkillForm, BlogPostForm, LegalPageForm
 
 
 def _staff_required(view_func):
@@ -278,3 +278,37 @@ def dashboard_message_delete(request, pk):
     msg.delete()
     messages.success(request, 'Message deleted.')
     return redirect('dashboard_messages')
+
+
+# ── LEGAL PAGES ───────────────────────────────────────────────────
+
+@_staff_required
+def dashboard_legal(request):
+    terms = LegalPage.objects.filter(page_type='terms').first()
+    privacy = LegalPage.objects.filter(page_type='privacy').first()
+
+    terms_form = LegalPageForm(request.POST or None, instance=terms, prefix='terms')
+    privacy_form = LegalPageForm(request.POST or None, instance=privacy, prefix='privacy')
+
+    if request.method == 'POST':
+        if 'save_terms' in request.POST:
+            if terms_form.is_valid():
+                obj = terms_form.save(commit=False)
+                obj.page_type = 'terms'
+                obj.save()
+                messages.success(request, 'Terms of Service updated.')
+                return redirect('dashboard_legal')
+            else:
+                messages.error(request, 'Please fix the errors in the Terms form.')
+        elif 'save_privacy' in request.POST:
+            if privacy_form.is_valid():
+                obj = privacy_form.save(commit=False)
+                obj.page_type = 'privacy'
+                obj.save()
+                messages.success(request, 'Privacy Policy updated.')
+                return redirect('dashboard_legal')
+            else:
+                messages.error(request, 'Please fix the errors in the Privacy form.')
+
+    ctx = _dash_context(request, terms_form=terms_form, privacy_form=privacy_form, terms=terms, privacy=privacy)
+    return render(request, 'core/dashboard/legal.html', ctx)

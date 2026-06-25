@@ -10,6 +10,8 @@ urlpatterns = [
     path('blog/', views.blog, name='blog'),
     path('blog/<slug:slug>/', views.blog_detail, name='blog_detail'),
     path('contact/', views.contact, name='contact'),
+    path('terms/', views.terms, name='terms'),
+    path('privacy/', views.privacy, name='privacy'),
     path('share/<int:post_id>/', views.share_to_social, name='share_to_social'),
     path('sitemap.xml', views.sitemap, name='sitemap'),
     path('robots.txt', views.robots, name='robots'),
@@ -41,4 +43,6 @@ urlpatterns = [
     path('dashboard/messages/', dv.dashboard_messages, name='dashboard_messages'),
     path('dashboard/messages/<int:pk>/', dv.dashboard_message_view, name='dashboard_message_view'),
     path('dashboard/messages/<int:pk>/delete/', dv.dashboard_message_delete, name='dashboard_message_delete'),
+
+    path('dashboard/legal/', dv.dashboard_legal, name='dashboard_legal'),
 ]

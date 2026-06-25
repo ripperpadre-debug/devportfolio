@@ -1,0 +1,72 @@
+{% extends 'core/dashboard/base.html' %}
+{% block nav_legal %}active{% endblock %}
+{% block page_title %}Legal Pages{% endblock %}
+
+{% block content %}
+<div class="stat-grid" style="grid-template-columns:1fr 1fr;margin-bottom:1.5rem">
+  <div class="stat-card">
+    <div class="stat-label">Terms of Service</div>
+    <div class="stat-num stat-accent" style="font-size:0.85rem;font-weight:400;font-family:var(--font)">
+      {% if terms %}Last updated {{ terms.updated_at|date:"M j, Y" }}{% else %}Not yet created{% endif %}
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Privacy Policy</div>
+    <div class="stat-num stat-accent" style="font-size:0.85rem;font-weight:400;font-family:var(--font)">
+      {% if privacy %}Last updated {{ privacy.updated_at|date:"M j, Y" }}{% else %}Not yet created{% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="form-grid" style="grid-template-columns:1fr 1fr">
+  <div class="dash-card">
+    <div class="dash-card-header">
+      <span class="dash-card-title">📜 Terms of Service</span>
+    </div>
+    <div class="dash-card-body">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="save_terms" value="1">
+        <div class="field-group" style="margin-bottom:1rem">
+          <label class="field-label">Title</label>
+          {{ terms_form.title }}
+          {% if terms_form.title.errors %}<div class="field-errors">{{ terms_form.title.errors }}</div>{% endif %}
+        </div>
+        <div class="field-group">
+          <label class="field-label">Content (HTML)</label>
+          {{ terms_form.content }}
+          {% if terms_form.content.errors %}<div class="field-errors">{{ terms_form.content.errors }}</div>{% endif %}
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-save">Save Terms</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="dash-card">
+    <div class="dash-card-header">
+      <span class="dash-card-title">🔒 Privacy Policy</span>
+    </div>
+    <div class="dash-card-body">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="save_privacy" value="1">
+        <div class="field-group" style="margin-bottom:1rem">
+          <label class="field-label">Title</label>
+          {{ privacy_form.title }}
+          {% if privacy_form.title.errors %}<div class="field-errors">{{ privacy_form.title.errors }}</div>{% endif %}
+        </div>
+        <div class="field-group">
+          <label class="field-label">Content (HTML)</label>
+          {{ privacy_form.content }}
+          {% if privacy_form.content.errors %}<div class="field-errors">{{ privacy_form.content.errors }}</div>{% endif %}
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-save">Save Privacy</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

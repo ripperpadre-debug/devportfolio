@@ -125,6 +125,24 @@ class ContactMessage(models.Model):
         return f"{self.name} – {self.subject}"
 
 
+class LegalPage(models.Model):
+    PAGE_TYPES = [
+        ('terms', 'Terms of Service'),
+        ('privacy', 'Privacy Policy'),
+    ]
+    page_type = models.CharField(max_length=20, choices=PAGE_TYPES, unique=True)
+    title = models.CharField(max_length=200)
+    content = models.TextField(help_text="HTML content — use <h2>, <p>, <a> etc.")
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.get_page_type_display()
+
+    class Meta:
+        verbose_name = "Legal Page"
+        verbose_name_plural = "Legal Pages"
+
+
 class SocialShareLog(models.Model):
     PLATFORM_CHOICES = [('twitter', 'Twitter/X'), ('linkedin', 'LinkedIn')]
     platform = models.CharField(max_length=20, choices=PLATFORM_CHOICES)

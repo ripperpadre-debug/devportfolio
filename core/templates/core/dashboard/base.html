@@ -387,6 +387,9 @@
         <span class="s-icon">💬</span> Messages
         {% if unread_count %}<span class="sidebar-badge">{{ unread_count }}</span>{% endif %}
       </a>
+      <a href="{% url 'dashboard_legal' %}" class="sidebar-link {% block nav_legal %}{% endblock %}">
+        <span class="s-icon">📜</span> Legal Pages
+      </a>
 
       <div class="sidebar-divider"></div>
       <a href="/" target="_blank" class="sidebar-link">

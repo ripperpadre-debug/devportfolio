@@ -1,5 +1,5 @@
 from django import forms
-from .models import Profile, Project, Skill, BlogPost
+from .models import Profile, Project, Skill, BlogPost, LegalPage
 
 
 class ProfileForm(forms.ModelForm):
@@ -51,4 +51,13 @@ class BlogPostForm(forms.ModelForm):
             'excerpt': forms.Textarea(attrs={'rows': 3}),
             'content': forms.Textarea(attrs={'rows': 16}),
             'tags': forms.TextInput(attrs={'placeholder': 'python, django, tutorial'}),
+        }
+
+
+class LegalPageForm(forms.ModelForm):
+    class Meta:
+        model = LegalPage
+        fields = ['title', 'content']
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 20, 'class': 'field-input code-input'}),
         }

@@ -8,7 +8,7 @@ from django.views.decorators.http import require_POST
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
-from .models import Profile, Project, BlogPost, Skill, ContactMessage, SocialShareLog
+from .models import Profile, Project, BlogPost, Skill, ContactMessage, SocialShareLog, LegalPage
 
 
 def get_profile():

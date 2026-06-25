@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile, Project, BlogPost, Skill, ContactMessage, SocialShareLog
+from .models import Profile, Project, BlogPost, Skill, ContactMessage, SocialShareLog, LegalPage
 
 
 @admin.register(Profile)
@@ -37,6 +37,12 @@ class ContactMessageAdmin(admin.ModelAdmin):
     list_display = ['name', 'email', 'subject', 'sent_at', 'read']
     list_editable = ['read']
     list_filter = ['read']
+
+
+@admin.register(LegalPage)
+class LegalPageAdmin(admin.ModelAdmin):
+    list_display = ['page_type', 'title', 'updated_at']
+    readonly_fields = ['page_type', 'updated_at']
 
 
 @admin.register(SocialShareLog)

@@ -1,0 +1,77 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ page.title|default:page_name }}{% endblock %}
+{% block description %}{{ page_name }} for {{ site_profile.name|default:"Portfolio" }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <p class="section-label">Legal</p>
+    <h1>{{ page.title|default:page_name }}</h1>
+    <p class="page-hero-sub">Last updated: {{ page.updated_at|date:"F j, Y"|default:"{% now 'F j, Y' %}" }}</p>
+  </div>
+</section>
+
+<section>
+  <div class="container" style="max-width:800px">
+    <div class="legal-text">
+      {% if page %}
+        {{ page.content|safe }}
+      {% elif page_name == "Terms of Service" %}
+        <h2>1. Acceptance of Terms</h2>
+        <p>By accessing and using this website, you accept and agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use this website.</p>
+
+        <h2>2. Use of the Website</h2>
+        <p>You agree to use this website only for lawful purposes and in a manner that does not infringe the rights of, restrict, or inhibit anyone else's use of the website. Prohibited behavior includes harassing, causing distress or inconvenience to others, or transmitting obscene or offensive content.</p>
+
+        <h2>3. Intellectual Property</h2>
+        <p>All content on this website — including text, graphics, logos, images, and code — is the property of {{ site_profile.name|default:"the site owner" }} unless otherwise stated. You may not reproduce, distribute, or use any content without prior written permission.</p>
+
+        <h2>4. Contact Form</h2>
+        <p>When you submit a message via the contact form, you agree to provide accurate and truthful information. Submitted messages are stored securely and used solely for the purpose of responding to your inquiry.</p>
+
+        <h2>5. Limitation of Liability</h2>
+        <p>This website is provided "as is" without any representations or warranties. {{ site_profile.name|default:"The site owner" }} shall not be held liable for any damages arising from the use or inability to use this website.</p>
+
+        <h2>6. External Links</h2>
+        <p>This website may contain links to third-party websites. We are not responsible for the content, privacy policies, or practices of these external sites.</p>
+
+        <h2>7. Changes to Terms</h2>
+        <p>We reserve the right to update these Terms of Service at any time. Changes will be posted on this page with an updated revision date.</p>
+
+        <h2>8. Contact</h2>
+        <p>If you have any questions about these Terms, please <a href="{% url 'contact' %}" style="color:var(--accent)">get in touch</a>.</p>
+      {% else %}
+        <h2>1. Information We Collect</h2>
+        <p>When you use the contact form on this website, we collect your name, email address, and any message you choose to submit. We also collect standard server logs including your IP address, browser type, and pages visited for analytics and security purposes.</p>
+
+        <h2>2. How We Use Your Information</h2>
+        <p>The information you provide via the contact form is used solely to respond to your inquiry. Server log data is used to analyze website traffic, diagnose technical issues, and improve the user experience.</p>
+
+        <h2>3. Data Storage & Security</h2>
+        <p>Contact form submissions are stored securely in our database. We implement reasonable security measures to protect your data from unauthorized access, alteration, or destruction.</p>
+
+        <h2>4. Third-Party Services</h2>
+        <p>This website may use third-party services such as Cloudinary for image hosting and Google Fonts for typography. These services have their own privacy policies governing data collection and use.</p>
+
+        <h2>5. Cookies</h2>
+        <p>This website may use cookies to enhance your browsing experience. You can choose to disable cookies in your browser settings, though some features of the site may not function properly as a result.</p>
+
+        <h2>6. Your Rights</h2>
+        <p>You have the right to request access to, correction of, or deletion of any personal data we hold about you. To exercise these rights, please <a href="{% url 'contact' %}" style="color:var(--accent)">contact us</a>.</p>
+
+        <h2>7. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated revision date.</p>
+
+        <h2>8. Contact</h2>
+        <p>If you have any questions about this Privacy Policy, please <a href="{% url 'contact' %}" style="color:var(--accent)">get in touch</a>.</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<style>
+  .legal-text h2 { font-size: 1.2rem; margin-top: 2rem; margin-bottom: 0.5rem; color: var(--text); }
+  .legal-text p { color: var(--text-muted); line-height: 1.8; margin-bottom: 0.5rem; font-size: 0.95rem; }
+  .legal-text a { color: var(--accent); }
+</style>
+{% endblock %}
