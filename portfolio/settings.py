@@ -56,12 +56,13 @@ except ImportError:  # pragma: no cover - optional dependency in local/dev setup
     cloudinary = None
     cloudinary_storage = None
 SECRET_KEY = 'django-insecure-change-this-in-production-use-env-variable'
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = [
     'https://*.replit.dev',
     'https://*.repl.co',
     'https://*.spock.replit.dev',
+    'https://*.vercel.app',
     'http://localhost:5000',
 ]
 
@@ -92,6 +93,7 @@ INSTALLED_APPS.append('core')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -260,13 +262,15 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'core' / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}
 
 MEDIA_URL = '/media/'
 if use_cloudinary_storage():
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticCloudinaryStorage'
+    STORAGES["default"] = {"BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"}
     CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL', '')
     CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', '')
     CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '')

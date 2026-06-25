@@ -1,0 +1,13 @@
+{% extends 'core/base.html' %}
+{% block title %}Access Denied — Portfolio{% endblock %}
+{% block description %}You don't have permission to access this page.{% endblock %}
+{% block content %}
+<section style="min-height:60vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:4rem 1.5rem">
+  <div>
+    <p style="font-size:clamp(4rem,12vw,8rem);font-weight:700;font-family:var(--font-mono);color:var(--accent3);line-height:1;margin-bottom:0.5rem">403</p>
+    <h1 style="margin-bottom:0.75rem">Access Denied</h1>
+    <p style="color:var(--text-muted);max-width:420px;margin:0 auto 2rem;line-height:1.7">You don't have permission to access this page.</p>
+    <a href="/" class="btn btn-primary">Back to Home</a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'core/base.html' %}
+{% block title %}Page Not Found — Portfolio{% endblock %}
+{% block description %}The page you're looking for doesn't exist.{% endblock %}
+{% block content %}
+<section style="min-height:60vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:4rem 1.5rem">
+  <div>
+    <p style="font-size:clamp(4rem,12vw,8rem);font-weight:700;font-family:var(--font-mono);color:var(--accent);line-height:1;margin-bottom:0.5rem">404</p>
+    <h1 style="margin-bottom:0.75rem">Page Not Found</h1>
+    <p style="color:var(--text-muted);max-width:420px;margin:0 auto 2rem;line-height:1.7">The page you're looking for doesn't exist or has been moved.</p>
+    <a href="/" class="btn btn-primary">Back to Home</a>
+  </div>
+</section>
+{% endblock %}

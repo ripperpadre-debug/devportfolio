@@ -1,0 +1,13 @@
+{% extends 'core/base.html' %}
+{% block title %}Server Error — Portfolio{% endblock %}
+{% block description %}Something went wrong on our end.{% endblock %}
+{% block content %}
+<section style="min-height:60vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:4rem 1.5rem">
+  <div>
+    <p style="font-size:clamp(4rem,12vw,8rem);font-weight:700;font-family:var(--font-mono);color:var(--accent2);line-height:1;margin-bottom:0.5rem">500</p>
+    <h1 style="margin-bottom:0.75rem">Server Error</h1>
+    <p style="color:var(--text-muted);max-width:420px;margin:0 auto 2rem;line-height:1.7">Something went wrong on our end. Please try again later.</p>
+    <a href="/" class="btn btn-primary">Back to Home</a>
+  </div>
+</section>
+{% endblock %}
