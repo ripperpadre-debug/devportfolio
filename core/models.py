@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from portfolio.storage import resume_storage
 
 
 class Profile(models.Model):
@@ -7,7 +8,7 @@ class Profile(models.Model):
     tagline = models.CharField(max_length=200, default="Full Stack Developer | Data Scientist")
     bio = models.TextField(default="")
     avatar = models.ImageField(upload_to='profile/', blank=True, null=True)
-    resume = models.FileField(upload_to='resume/', blank=True, null=True)
+    resume = models.FileField(upload_to='resume/', storage=resume_storage, blank=True, null=True)
     github = models.URLField(blank=True)
     linkedin = models.URLField(blank=True)
     twitter = models.URLField(blank=True)
