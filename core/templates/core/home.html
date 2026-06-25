@@ -259,7 +259,11 @@
       </div>
       {% empty %}
       <div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:2.5rem">
-        <p>Add skills via the <a href="/admin/" style="color:var(--accent)">Admin panel</a></p>
+        {% if request.user.is_staff %}
+        <p>No skills added yet. <a href="/dashboard/" style="color:var(--accent)">Go to Dashboard →</a></p>
+        {% else %}
+        <p>Skills coming soon.</p>
+        {% endif %}
       </div>
       {% endfor %}
     </div>
