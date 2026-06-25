@@ -70,8 +70,10 @@
         {% endif %}
         <div class="blog-meta">
           <span>{{ post.created_at|date:"M d, Y" }}</span>
+          {% if post.content %}
           <span>·</span>
           <span>{{ post.content|wordcount }} words</span>
+          {% endif %}
         </div>
         <a href="/blog/{{ post.slug }}/" class="blog-title-link">{{ post.title }}</a>
         <p class="blog-excerpt">{{ post.excerpt|default:post.content|truncatewords:22 }}</p>

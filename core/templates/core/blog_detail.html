@@ -101,7 +101,7 @@
       {% endfor %}
     </div>
     <h1>{{ post.title }}</h1>
-    <p class="post-meta">{{ post.created_at|date:"F d, Y" }} &nbsp;·&nbsp; {{ post.content|wordcount }} words</p>
+    <p class="post-meta">{{ post.created_at|date:"F d, Y" }}{% if post.content %} &nbsp;·&nbsp; {{ post.content|wordcount }} words{% endif %}</p>
   </div>
 </div>
 
