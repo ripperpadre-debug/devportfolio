@@ -178,6 +178,14 @@
     .fb-3 { bottom: -8%; right: 6%; }
     .skill-bar-row { grid-template-columns: 90px 1fr 32px; }
   }
+  @media(max-width: 380px) {
+    /* On very small phones hide the decorative floating badges to avoid overflow */
+    .floating-badge { display: none; }
+    .avatar-wrapper { width: clamp(150px, 60vw, 200px); height: clamp(150px, 60vw, 200px); }
+    .hero-stats { gap: 1rem; }
+    .hero-actions { flex-direction: column; align-items: center; }
+    .hero-actions .btn { width: 100%; text-align: center; }
+  }
 </style>
 {% endblock %}
 
