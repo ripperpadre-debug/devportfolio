@@ -6,3 +6,12 @@ tweepy>=4.14
 psycopg[binary]>=3.1
 cloudinary>=1.41.0
 django-cloudinary-storage>=0.3.0
+cloudinary>=1.41.0
+Django>=4.2,<5.0
+django-cloudinary-storage>=0.3.0
+gunicorn
+Pillow>=10.0
+psycopg[binary]>=3.1
+python-dotenv>=1.0
+requests>=2.31
+tweepy>=4.14
