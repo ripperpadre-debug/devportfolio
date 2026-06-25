@@ -17,6 +17,16 @@ class CloudinaryStorageTests(SimpleTestCase):
         with patch.dict(os.environ, {'CLOUDINARY_URL': 'cloudinary://test:test@test'}, clear=True):
             self.assertTrue(portfolio_settings.use_cloudinary_storage())
 
+    def test_environment_loader_uses_example_env_when_dotenv_missing(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            base_dir = Path(tmpdir)
+            (base_dir / '.env.example').write_text('CLOUDINARY_URL=cloudinary://test:test@test\n', encoding='utf-8')
+
+            with patch.object(portfolio_settings, 'BASE_DIR', base_dir):
+                with patch.dict(os.environ, {}, clear=True):
+                    portfolio_settings.load_environment_variables()
+                    self.assertEqual(os.environ.get('CLOUDINARY_URL'), 'cloudinary://test:test@test')
+
 
 class DatabaseConfigTests(SimpleTestCase):
     def test_sqlite_config_uses_custom_path_when_set(self):

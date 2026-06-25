@@ -4,8 +4,6 @@ import shutil
 import tempfile
 from urllib.parse import unquote, urlparse
 
-from dotenv import load_dotenv
-
 try:
     import cloudinary
     import cloudinary_storage  # noqa: F401
@@ -14,7 +12,39 @@ except ImportError:  # pragma: no cover - optional dependency in local/dev setup
     cloudinary_storage = None
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / '.env')
+
+
+def load_environment_variables():
+    env_files = [BASE_DIR / '.env']
+    needs_cloudinary_defaults = not (
+        os.environ.get('CLOUDINARY_URL')
+        or (
+            os.environ.get('CLOUDINARY_CLOUD_NAME')
+            and os.environ.get('CLOUDINARY_API_KEY')
+            and os.environ.get('CLOUDINARY_API_SECRET')
+        )
+    )
+    if needs_cloudinary_defaults:
+        env_files.append(BASE_DIR / '.env.example')
+
+    for env_file in env_files:
+        if not env_file.exists():
+            continue
+
+        with env_file.open(encoding='utf-8') as handle:
+            for raw_line in handle:
+                line = raw_line.strip()
+                if not line or line.startswith('#') or '=' not in line:
+                    continue
+
+                key, value = line.split('=', 1)
+                key = key.strip()
+                value = value.strip().strip('"').strip("'")
+                if key and key not in os.environ:
+                    os.environ[key] = value
+
+
+load_environment_variables()
 SECRET_KEY = 'django-insecure-change-this-in-production-use-env-variable'
 DEBUG = True
 ALLOWED_HOSTS = ['*']
