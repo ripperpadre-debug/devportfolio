@@ -48,7 +48,7 @@ def should_sync_sqlite_to_postgres():
     if not source_path or not os.path.exists(source_path):
         return False
 
-    return env_flag('AUTO_SYNC_SQLITE_TO_POSTGRES') or running_on_vercel()
+    return env_flag('AUTO_SYNC_SQLITE_TO_POSTGRES')
 
 
 def sync_sqlite_to_postgres():
