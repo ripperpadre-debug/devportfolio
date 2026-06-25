@@ -1,0 +1,49 @@
+{% extends 'core/base.html' %}
+{% block title %}Terms of Service{% endblock %}
+{% block description %}Terms of Service for {{ site_profile.name|default:"Portfolio" }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <p class="section-label">Legal</p>
+    <h1>Terms of Service</h1>
+    <p class="page-hero-sub">Last updated: {% now "F j, Y" %}</p>
+  </div>
+</section>
+
+<section>
+  <div class="container" style="max-width:800px">
+    <div class="legal-text">
+      <h2>1. Acceptance of Terms</h2>
+      <p>By accessing and using this website, you accept and agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use this website.</p>
+
+      <h2>2. Use of the Website</h2>
+      <p>You agree to use this website only for lawful purposes and in a manner that does not infringe the rights of, restrict, or inhibit anyone else's use of the website. Prohibited behavior includes harassing, causing distress or inconvenience to others, or transmitting obscene or offensive content.</p>
+
+      <h2>3. Intellectual Property</h2>
+      <p>All content on this website — including text, graphics, logos, images, and code — is the property of {{ site_profile.name|default:"the site owner" }} unless otherwise stated. You may not reproduce, distribute, or use any content without prior written permission.</p>
+
+      <h2>4. Contact Form</h2>
+      <p>When you submit a message via the contact form, you agree to provide accurate and truthful information. Submitted messages are stored securely and used solely for the purpose of responding to your inquiry.</p>
+
+      <h2>5. Limitation of Liability</h2>
+      <p>This website is provided "as is" without any representations or warranties. {{ site_profile.name|default:"The site owner" }} shall not be held liable for any damages arising from the use or inability to use this website.</p>
+
+      <h2>6. External Links</h2>
+      <p>This website may contain links to third-party websites. We are not responsible for the content, privacy policies, or practices of these external sites.</p>
+
+      <h2>7. Changes to Terms</h2>
+      <p>We reserve the right to update these Terms of Service at any time. Changes will be posted on this page with an updated revision date.</p>
+
+      <h2>8. Contact</h2>
+      <p>If you have any questions about these Terms, please <a href="{% url 'contact' %}" style="color:var(--accent)">get in touch</a>.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .legal-text h2 { font-size: 1.2rem; margin-top: 2rem; margin-bottom: 0.5rem; color: var(--text); }
+  .legal-text p { color: var(--text-muted); line-height: 1.8; margin-bottom: 0.5rem; font-size: 0.95rem; }
+  .legal-text a { color: var(--accent); }
+</style>
+{% endblock %}

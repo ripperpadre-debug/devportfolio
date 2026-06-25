@@ -11,6 +11,8 @@ urlpatterns = [
     path('blog/<slug:slug>/', views.blog_detail, name='blog_detail'),
     path('contact/', views.contact, name='contact'),
     path('share/<int:post_id>/', views.share_to_social, name='share_to_social'),
+    path('sitemap.xml', views.sitemap, name='sitemap'),
+    path('robots.txt', views.robots, name='robots'),
 
     # Dashboard auth
     path('dashboard/login/', dv.dashboard_login, name='dashboard_login'),

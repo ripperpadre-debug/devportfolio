@@ -5,266 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Portfolio{% endblock %}</title>
   <meta name="description" content="{% block description %}Full Stack Developer & Data Scientist portfolio{% endblock %}">
+  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+  <!-- Open Graph -->
+  <meta property="og:site_name" content="{{ site_profile.name|default:'Portfolio' }}">
+  <meta property="og:title" content="{% block og_title %}Portfolio{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Full Stack Developer & Data Scientist portfolio{% endblock %}">
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  <meta property="og:image" content="{% block og_image %}{% endblock %}">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% block twitter_title %}Portfolio{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}Full Stack Developer & Data Scientist portfolio{% endblock %}">
+  <meta name="twitter:image" content="{% block twitter_image %}{% endblock %}">
   {% load static %}
-  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'icons/favicon-32x32.png' %}">
-  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'icons/favicon-16x16.png' %}">
-  <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
-  <link rel="apple-touch-icon" href="{% static 'icons/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" href="{% static 'icons/icon.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'icons/icon.png' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #0B1120;
-      --surface: #111827;
-      --surface2: #1F2937;
-      --border: #263244;
-      --accent: #2DD4BF;
-      --accent2: #3B82F6;
-      --accent3: #14B8A6;
-      --text: #E5E7EB;
-      --text-muted: #9CA3AF;
-      --text-dim: #6B7280;
-      --font-display: 'Space Grotesk', sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
-      --radius: 12px;
-      --radius-sm: 8px;
-      --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
-      --nav-h: 68px;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: var(--font-display);
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    /* ── NAV ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 clamp(1rem, 4vw, 2.5rem);
-      height: var(--nav-h);
-      background: rgba(11, 17, 32, 0.92);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      transition: box-shadow var(--transition);
-    }
-    nav.scrolled { box-shadow: 0 4px 30px rgba(0,0,0,0.4); }
-
-    .nav-logo {
-      font-family: var(--font-display);
-      font-size: 1.05rem; font-weight: 700;
-      color: var(--text);
-      text-decoration: none;
-      letter-spacing: -0.3px;
-      flex-shrink: 0;
-    }
-    .nav-logo:hover { color: var(--accent); transition: color var(--transition); }
-
-    .nav-right { display: flex; align-items: center; gap: 0.5rem; }
-
-    .nav-links {
-      display: flex; gap: 0.25rem; list-style: none; align-items: center;
-    }
-    .nav-links a {
-      color: var(--text-muted); text-decoration: none;
-      font-size: 0.875rem; font-weight: 500;
-      padding: 0.5rem 0.75rem; border-radius: var(--radius-sm);
-      transition: all var(--transition);
-      position: relative; white-space: nowrap;
-    }
-    .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-    .nav-links a.active { color: var(--accent); }
-
-    .nav-cta {
-      padding: 0.5rem 1.25rem !important;
-      background: var(--accent) !important; color: var(--bg) !important;
-      border-radius: var(--radius-sm) !important; font-weight: 600 !important;
-      margin-left: 0.5rem;
-    }
-    .nav-cta:hover { background: #fff !important; color: var(--bg) !important; transform: translateY(-1px); }
-
-    /* Mobile hamburger */
-    .hamburger {
-      display: none; flex-direction: column; gap: 5px;
-      cursor: pointer; background: none; border: none;
-      padding: 8px; border-radius: var(--radius-sm);
-      transition: background var(--transition);
-      z-index: 1001;
-    }
-    .hamburger:hover { background: rgba(255,255,255,0.06); }
-    .hamburger span {
-      width: 22px; height: 2px; background: var(--text);
-      border-radius: 2px; transition: all 0.3s ease;
-      display: block;
-    }
-    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-    .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-    /* Mobile drawer overlay */
-    .nav-overlay {
-      display: none; position: fixed; inset: 0; z-index: 999;
-      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-    }
-    .nav-overlay.open { display: block; }
-
-    /* MAIN */
-    main { padding-top: var(--nav-h); }
-
-    /* SECTIONS */
-    section { padding: clamp(3rem, 8vw, 5rem) 0; }
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }
-
-    .section-label {
-      font-family: var(--font-mono);
-      font-size: 0.7rem; color: var(--accent);
-      text-transform: uppercase; letter-spacing: 3px;
-      margin-bottom: 0.75rem;
-    }
-
-    h1, h2, h3 { font-weight: 700; line-height: 1.15; }
-    h1 { font-size: clamp(2.2rem, 5.5vw, 4rem); }
-    h2 { font-size: clamp(1.6rem, 3.5vw, 2.5rem); }
-    h3 { font-size: clamp(1rem, 2vw, 1.2rem); }
-
-    /* CARDS */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      transition: all var(--transition);
-    }
-    .card:hover {
-      border-color: rgba(31,191,138,0.4);
-      transform: translateY(-3px);
-      box-shadow: 0 16px 48px rgba(31, 191, 138, 0.07);
-    }
-
-    /* BUTTONS */
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
-      padding: 0.7rem 1.5rem;
-      border-radius: var(--radius-sm); font-weight: 600; font-size: 0.875rem;
-      text-decoration: none; cursor: pointer;
-      transition: all var(--transition); border: none;
-      font-family: var(--font-display);
-      white-space: nowrap;
-    }
-    .btn-primary { background: var(--accent); color: var(--bg); }
-    .btn-primary:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(31,191,138,0.25); }
-    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-    .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: rgba(31,191,138,0.05); }
-    .btn-ghost { background: transparent; color: var(--text-muted); }
-    .btn-ghost:hover { color: var(--accent); }
-    .btn-sm { padding: 0.45rem 1rem; font-size: 0.8rem; }
-
-    /* TAGS */
-    .tag {
-      display: inline-block;
-      padding: 0.2rem 0.65rem;
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 100px; font-size: 0.72rem;
-      color: var(--text-muted); font-family: var(--font-mono);
-    }
-    .tag-accent { background: rgba(31,191,138,0.08); border-color: rgba(31,191,138,0.25); color: var(--accent); }
-
-    /* GRID */
-    .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 1.25rem; }
-    .grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); gap: 1.25rem; }
-
-    /* MESSAGES */
-    .messages { position: fixed; top: calc(var(--nav-h) + 12px); right: 1rem; z-index: 2000; display: flex; flex-direction: column; gap: 0.5rem; max-width: calc(100vw - 2rem); }
-    .msg {
-      padding: 0.875rem 1.25rem; border-radius: var(--radius);
-      font-size: 0.875rem; font-weight: 500;
-      animation: slideIn 0.3s ease;
-    }
-    .msg-success { background: rgba(23, 168, 110, 0.12); border: 1px solid var(--accent3); color: var(--accent3); }
-    .msg-error { background: rgba(239, 68, 68, 0.12); border: 1px solid #EF4444; color: #EF4444; }
-    @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-    /* FOOTER */
-    footer {
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      padding: clamp(1.5rem, 4vw, 2.5rem) 0;
-    }
-    .footer-inner { display: flex; flex-direction: column; align-items: center; gap: 1.25rem; text-align: center; }
-    .footer-links { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; row-gap: 0.4rem; }
-    .footer-links a {
-      color: var(--text-muted); text-decoration: none; font-size: 0.85rem;
-      padding: 0.35rem 0.7rem; border-radius: var(--radius-sm);
-      transition: color var(--transition);
-    }
-    .footer-links a:hover { color: var(--accent); }
-    footer p { color: var(--text-dim); font-size: 0.8rem; }
-
-    /* UTILS */
-    .glow { filter: drop-shadow(0 0 20px rgba(31, 191, 138, 0.4)); }
-    .gradient-text {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-
-    /* SCROLL REVEAL */
-    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    /* PAGE HERO (shared) */
-    .page-hero {
-      padding: clamp(2.5rem, 6vw, 4rem) 0 clamp(2rem, 4vw, 3rem);
-      background: var(--surface); border-bottom: 1px solid var(--border);
-    }
-    .page-hero-sub { color: var(--text-muted); margin-top: 0.6rem; max-width: 520px; font-size: clamp(0.9rem, 2vw, 1rem); line-height: 1.7; }
-
-    /* DIVIDER */
-    .section-divider { height: 1px; background: var(--border); margin: 0; }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      .nav-links {
-        display: none;
-        flex-direction: column; gap: 0.25rem;
-        position: fixed; top: var(--nav-h); right: 0; bottom: 0;
-        width: min(280px, 85vw);
-        background: var(--surface);
-        border-left: 1px solid var(--border);
-        padding: 1.5rem 1rem;
-        overflow-y: auto;
-        z-index: 1000;
-        transform: translateX(100%);
-        transition: transform 0.3s ease;
-      }
-      .nav-links.open { display: flex; transform: translateX(0); }
-      .nav-links a { font-size: 1rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); }
-      .nav-cta { margin: 0.5rem 0 0 0 !important; padding: 0.75rem 1rem !important; }
-      .hamburger { display: flex; }
-      .nav-right { gap: 0; }
-    }
-
-    @media (max-width: 480px) {
-      .grid-3, .grid-2 { grid-template-columns: 1fr; }
-    }
-  </style>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% block structured_data %}{% endblock %}
   {% block extra_head %}{% endblock %}
 </head>
 <body>
-  <nav id="mainNav">
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <nav id="mainNav" aria-label="Main navigation">
     <a href="/" class="nav-logo">{{ site_profile.name|default:"Alex Kimani" }}</a>
     <div class="nav-right">
       <ul class="nav-links" id="navLinks">
-        <li><a href="/" {% if request.resolver_match.url_name == 'home' %}class="active"{% endif %}>Home</a></li>
-        <li><a href="/projects/" {% if request.resolver_match.url_name == 'projects' or request.resolver_match.url_name == 'project_detail' %}class="active"{% endif %}>Projects</a></li>
-        <li><a href="/blog/" {% if request.resolver_match.url_name == 'blog' or request.resolver_match.url_name == 'blog_detail' %}class="active"{% endif %}>Blog</a></li>
+        <li><a href="/" {% if request.resolver_match.url_name == 'home' %}class="active" aria-current="page"{% endif %}>Home</a></li>
+        <li><a href="/projects/" {% if request.resolver_match.url_name == 'projects' or request.resolver_match.url_name == 'project_detail' %}class="active" aria-current="page"{% endif %}>Projects</a></li>
+        <li><a href="/blog/" {% if request.resolver_match.url_name == 'blog' or request.resolver_match.url_name == 'blog_detail' %}class="active" aria-current="page"{% endif %}>Blog</a></li>
         <li><a href="/contact/" class="nav-cta" {% if request.resolver_match.url_name == 'contact' %}style="background:#fff!important"{% endif %}>Hire Me</a></li>
         {% if request.user.is_staff %}
         <li><a href="/dashboard/" style="color:var(--accent2)!important">⚡ Dashboard</a></li>
@@ -279,14 +51,14 @@
   <div class="nav-overlay" id="navOverlay"></div>
 
   {% if messages %}
-  <div class="messages">
+  <div class="messages" aria-live="polite" aria-atomic="true">
     {% for message in messages %}
-    <div class="msg msg-{{ message.tags }}">{{ message }}</div>
+    <div class="msg msg-{{ message.tags }}" role="status">{{ message }}</div>
     {% endfor %}
   </div>
   {% endif %}
 
-  <main>{% block content %}{% endblock %}</main>
+  <main id="main-content" tabindex="-1">{% block content %}{% endblock %}</main>
 
   <footer>
     <div class="container">
@@ -341,6 +113,18 @@
       entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
     }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Filter bar scroll indicators
+    document.querySelectorAll('.filter-bar, .tag-filter').forEach(bar => {
+      const wrapper = bar.closest('.filter-bar-scroll, .tag-filter-scroll');
+      if (!wrapper) return;
+      const updateScrollIndicator = () => {
+        wrapper.style.setProperty('--scrollable', bar.scrollWidth > bar.clientWidth ? '1' : '0');
+      };
+      bar.addEventListener('scroll', updateScrollIndicator);
+      window.addEventListener('resize', updateScrollIndicator);
+      updateScrollIndicator();
+    });
   </script>
   {% block extra_js %}{% endblock %}
 </body>

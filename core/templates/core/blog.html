@@ -1,5 +1,10 @@
 {% extends 'core/base.html' %}
-{% block title %}Blog — Portfolio{% endblock %}
+{% block title %}Blog — {{ site_profile.name|default:"Portfolio" }}{% endblock %}
+{% block description %}Read articles by {{ site_profile.name|default:"Portfolio" }} on software engineering, data science, and building things.{% endblock %}
+{% block og_title %}Blog — {{ site_profile.name|default:"Portfolio" }}{% endblock %}
+{% block og_description %}Read articles by {{ site_profile.name|default:"Portfolio" }} on software engineering, data science, and building things.{% endblock %}
+{% block twitter_title %}Blog — {{ site_profile.name|default:"Portfolio" }}{% endblock %}
+{% block twitter_description %}Read articles by {{ site_profile.name|default:"Portfolio" }} on software engineering, data science, and building things.{% endblock %}
 {% block extra_head %}
 <style>
   .tag-filter {
@@ -54,11 +59,13 @@
 <section>
   <div class="container">
     {% if all_tags %}
-    <div class="tag-filter">
-      <a href="/blog/" class="tag-btn {% if not active_tag %}active{% endif %}">All</a>
-      {% for tag in all_tags %}
-      <a href="/blog/?tag={{ tag }}" class="tag-btn {% if active_tag == tag %}active{% endif %}">{{ tag }}</a>
-      {% endfor %}
+    <div class="tag-filter-scroll" style="position:relative">
+      <div class="tag-filter" id="blogTagFilter">
+        <a href="/blog/" class="tag-btn {% if not active_tag %}active{% endif %}">All</a>
+        {% for tag in all_tags %}
+        <a href="/blog/?tag={{ tag }}" class="tag-btn {% if active_tag == tag %}active{% endif %}">{{ tag }}</a>
+        {% endfor %}
+      </div>
     </div>
     {% endif %}
 
@@ -70,10 +77,6 @@
         {% endif %}
         <div class="blog-meta">
           <span>{{ post.created_at|date:"M d, Y" }}</span>
-          {% if post.content %}
-          <span>·</span>
-          <span>{{ post.content|wordcount }} words</span>
-          {% endif %}
         </div>
         <a href="/blog/{{ post.slug }}/" class="blog-title-link">{{ post.title }}</a>
         <p class="blog-excerpt">{{ post.excerpt|default:post.content|truncatewords:22 }}</p>
@@ -94,6 +97,36 @@
       </div>
       {% endfor %}
     </div>
+
+    {% if posts.paginator.num_pages > 1 %}
+    <div class="pagination">
+      <span class="step-links">
+        {% if posts.has_previous %}
+          <a href="?{% if active_tag %}tag={{ active_tag }}&{% endif %}page=1">&laquo;</a>
+          <a href="?{% if active_tag %}tag={{ active_tag }}&{% endif %}page={{ posts.previous_page_number }}">&lsaquo;</a>
+        {% else %}
+          <span class="disabled">&laquo;</span>
+          <span class="disabled">&lsaquo;</span>
+        {% endif %}
+
+        {% for num in posts.paginator.page_range %}
+          {% if num == posts.number %}
+            <span class="current">{{ num }}</span>
+          {% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %}
+            <a href="?{% if active_tag %}tag={{ active_tag }}&{% endif %}page={{ num }}">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+
+        {% if posts.has_next %}
+          <a href="?{% if active_tag %}tag={{ active_tag }}&{% endif %}page={{ posts.next_page_number }}">&rsaquo;</a>
+          <a href="?{% if active_tag %}tag={{ active_tag }}&{% endif %}page={{ posts.paginator.num_pages }}">&raquo;</a>
+        {% else %}
+          <span class="disabled">&rsaquo;</span>
+          <span class="disabled">&raquo;</span>
+        {% endif %}
+      </span>
+    </div>
+    {% endif %}
   </div>
 </section>
 {% endblock %}

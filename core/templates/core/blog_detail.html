@@ -1,5 +1,29 @@
 {% extends 'core/base.html' %}
-{% block title %}{{ post.title }} — Blog{% endblock %}
+{% block title %}{{ post.title }} — {{ site_profile.name|default:"Portfolio" }}{% endblock %}
+{% block description %}{{ post.excerpt|default:post.content|truncatewords:25 }}{% endblock %}
+{% block og_title %}{{ post.title }} — {{ site_profile.name|default:"Portfolio" }}{% endblock %}
+{% block og_description %}{{ post.excerpt|default:post.content|truncatewords:25 }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_image %}{% if post.cover_image %}{{ request.scheme }}://{{ request.get_host }}{{ post.cover_image.url }}{% endif %}{% endblock %}
+{% block twitter_title %}{{ post.title }} — {{ site_profile.name|default:"Portfolio" }}{% endblock %}
+{% block twitter_description %}{{ post.excerpt|default:post.content|truncatewords:25 }}{% endblock %}
+{% block twitter_image %}{% if post.cover_image %}{{ request.scheme }}://{{ request.get_host }}{{ post.cover_image.url }}{% endif %}{% endblock %}
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "{{ post.title }}",
+  "description": "{{ post.excerpt|default:post.content|truncatewords:30 }}",
+  {% if post.cover_image %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ post.cover_image.url }}",{% endif %}
+  "datePublished": "{{ post.created_at|date:'c' }}",
+  "author": {
+    "@type": "Person",
+    "name": "{{ site_profile.name|default:'Portfolio' }}"
+  }
+}
+</script>
+{% endblock %}
 {% block extra_head %}
 <style>
   .post-hero { padding: clamp(2.5rem, 6vw, 4rem) 0 clamp(1.75rem, 4vw, 2.5rem); background: var(--surface); border-bottom: 1px solid var(--border); }
@@ -101,7 +125,7 @@
       {% endfor %}
     </div>
     <h1>{{ post.title }}</h1>
-    <p class="post-meta">{{ post.created_at|date:"F d, Y" }}{% if post.content %} &nbsp;·&nbsp; {{ post.content|wordcount }} words{% endif %}</p>
+    <p class="post-meta">{{ post.created_at|date:"F d, Y" }}</p>
   </div>
 </div>
 

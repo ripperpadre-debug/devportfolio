@@ -51,6 +51,20 @@
       </tbody>
     </table>
   </div>
+  {% if projects.paginator.num_pages > 1 %}
+  <div style="padding:0.75rem 1.375rem 1.125rem;border-top:1px solid var(--border)">
+    <div class="pagination" style="margin-top:0">
+      <span class="step-links">
+        {% if projects.has_previous %}<a href="?page=1">&laquo;</a><a href="?page={{ projects.previous_page_number }}">&lsaquo;</a>{% else %}<span class="disabled">&laquo;</span><span class="disabled">&lsaquo;</span>{% endif %}
+        {% for num in projects.paginator.page_range %}
+          {% if num == projects.number %}<span class="current">{{ num }}</span>
+          {% elif num > projects.number|add:'-3' and num < projects.number|add:'3' %}<a href="?page={{ num }}">{{ num }}</a>{% endif %}
+        {% endfor %}
+        {% if projects.has_next %}<a href="?page={{ projects.next_page_number }}">&rsaquo;</a><a href="?page={{ projects.paginator.num_pages }}">&raquo;</a>{% else %}<span class="disabled">&rsaquo;</span><span class="disabled">&raquo;</span>{% endif %}
+      </span>
+    </div>
+  </div>
+  {% endif %}
   {% else %}
   <div class="empty-state">
     <div class="empty-state-icon">💻</div>

@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.text import slugify
 from django.views.decorators.http import require_POST
+from django.core.paginator import Paginator
 
 from .models import Profile, Project, Skill, BlogPost, ContactMessage
 from .forms import ProfileForm, ProjectForm, SkillForm, BlogPostForm
@@ -91,7 +92,10 @@ def dashboard_profile(request):
 
 @_staff_required
 def dashboard_projects(request):
-    projects = Project.objects.all()
+    all_projects = Project.objects.all()
+    paginator = Paginator(all_projects, 15)
+    page = request.GET.get('page')
+    projects = paginator.get_page(page)
     ctx = _dash_context(request, projects=projects)
     return render(request, 'core/dashboard/projects.html', ctx)
 
@@ -141,7 +145,10 @@ def dashboard_project_delete(request, pk):
 
 @_staff_required
 def dashboard_skills(request):
-    skills = Skill.objects.all()
+    all_skills = Skill.objects.all()
+    paginator = Paginator(all_skills, 20)
+    page = request.GET.get('page')
+    skills = paginator.get_page(page)
     ctx = _dash_context(request, skills=skills)
     return render(request, 'core/dashboard/skills.html', ctx)
 
@@ -183,7 +190,10 @@ def dashboard_skill_delete(request, pk):
 
 @_staff_required
 def dashboard_blog(request):
-    posts = BlogPost.objects.all()
+    all_posts = BlogPost.objects.all()
+    paginator = Paginator(all_posts, 15)
+    page = request.GET.get('page')
+    posts = paginator.get_page(page)
     ctx = _dash_context(request, posts=posts)
     return render(request, 'core/dashboard/blog.html', ctx)
 
@@ -243,7 +253,10 @@ def dashboard_post_toggle(request, pk):
 
 @_staff_required
 def dashboard_messages(request):
-    msgs = ContactMessage.objects.all()
+    all_msgs = ContactMessage.objects.all()
+    paginator = Paginator(all_msgs, 15)
+    page = request.GET.get('page')
+    msgs = paginator.get_page(page)
     ctx = _dash_context(request, contact_messages=msgs)
     return render(request, 'core/dashboard/messages.html', ctx)
 

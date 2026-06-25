@@ -6,6 +6,7 @@ from django.db import connections
 from django.apps import apps
 
 
+# Ordered by FK dependency (parents before children).
 SYNC_MODELS = [
     ('auth', 'User'),
     ('auth', 'Group'),
@@ -21,7 +22,10 @@ SYNC_MODELS = [
 
 
 class Command(BaseCommand):
-    help = 'Copy data from SQLite to PostgreSQL preserving full field precision.'
+    help = (
+        'Insert missing rows from SQLite into PostgreSQL without overwriting '
+        'existing production data.'
+    )
 
     def handle(self, *args, **options):
         default = settings.DATABASES.get('default', {})
@@ -37,6 +41,8 @@ class Command(BaseCommand):
 
         with connections['sqlite_source'].cursor(), connections['default'].cursor():
             pass
+
+        total_inserted = 0
 
         for app_label, model_name in SYNC_MODELS:
             model = apps.get_model(app_label, model_name)
@@ -54,9 +60,16 @@ class Command(BaseCommand):
                 if f.remote_field.through._meta.auto_created
             ]
 
-            model.objects.using('default').all().delete()
+            target_pks = set(
+                model.objects.using('default')
+                .values_list('pk', flat=True)
+            )
 
+            inserted = 0
             for obj in source_objects:
+                if obj.pk in target_pks:
+                    continue
+
                 field_data = {
                     f.attname: getattr(obj, f.attname)
                     for f in model._meta.concrete_fields
@@ -70,17 +83,24 @@ class Command(BaseCommand):
                     )
                     if related_ids:
                         through_model = getattr(model, m2m.attname).through
-                        through_model.objects.using('default').filter(
-                            **{m2m.m2m_column_name(): new_obj.pk}
-                        ).delete()
                         for related_id in related_ids:
-                            through_model.objects.using('default').create(
+                            through_model.objects.using('default').get_or_create(
                                 **{
                                     m2m.m2m_column_name(): new_obj.pk,
                                     m2m.m2m_reverse_name(): related_id,
                                 }
                             )
 
-            self.stdout.write(f'  Synced {len(source_objects)} {app_label}.{model_name}')
+                inserted += 1
+                total_inserted += 1
 
-        self.stdout.write(self.style.SUCCESS('SQLite data synced to PostgreSQL.'))
+            if inserted:
+                self.stdout.write(
+                    f'  Inserted {inserted} new {app_label}.{model_name} '
+                    f'({len(source_objects) - inserted} already existed)'
+                )
+
+        if total_inserted == 0:
+            self.stdout.write(self.style.SUCCESS('PostgreSQL is already in sync — nothing to insert.'))
+        else:
+            self.stdout.write(self.style.SUCCESS(f'SQLite data synced to PostgreSQL ({total_inserted} rows inserted).'))

@@ -1,5 +1,26 @@
 {% extends 'core/base.html' %}
-{% block title %}{{ project.title }} — Portfolio{% endblock %}
+{% block title %}{{ project.title }} — {{ site_profile.name|default:"Portfolio" }}{% endblock %}
+{% block description %}{{ project.tagline|default:project.description|truncatewords:25 }}{% endblock %}
+{% block og_title %}{{ project.title }} — {{ site_profile.name|default:"Portfolio" }}{% endblock %}
+{% block og_description %}{{ project.tagline|default:project.description|truncatewords:25 }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_image %}{% if project.image %}{{ request.scheme }}://{{ request.get_host }}{{ project.image.url }}{% endif %}{% endblock %}
+{% block twitter_title %}{{ project.title }} — {{ site_profile.name|default:"Portfolio" }}{% endblock %}
+{% block twitter_description %}{{ project.tagline|default:project.description|truncatewords:25 }}{% endblock %}
+{% block twitter_image %}{% if project.image %}{{ request.scheme }}://{{ request.get_host }}{{ project.image.url }}{% endif %}{% endblock %}
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CreativeWork",
+  "name": "{{ project.title }}",
+  "description": "{{ project.tagline|default:project.description|truncatewords:30 }}",
+  {% if project.image %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ project.image.url }}",{% endif %}
+  "dateCreated": "{{ project.created_at|date:'c' }}",
+  "keywords": "{{ project.tech_stack }}"
+}
+</script>
+{% endblock %}
 {% block extra_head %}
 <style>
   .project-hero { padding: clamp(2.5rem, 6vw, 4rem) 0; background: var(--surface); border-bottom: 1px solid var(--border); }

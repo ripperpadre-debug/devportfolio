@@ -3,10 +3,11 @@ import requests
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.conf import settings
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.mail import send_mail
+from django.core.paginator import Paginator
 from .models import Profile, Project, BlogPost, Skill, ContactMessage, SocialShareLog
 
 
@@ -39,8 +40,11 @@ def projects(request):
     qs = Project.objects.all()
     if category:
         qs = qs.filter(category=category)
+    paginator = Paginator(qs, 9)
+    page = request.GET.get('page')
+    projects_page = paginator.get_page(page)
     categories = Project.CATEGORY_CHOICES
-    context = {'projects': qs, 'categories': categories, 'active_category': category}
+    context = {'projects': projects_page, 'categories': categories, 'active_category': category}
     return render(request, 'core/projects.html', context)
 
 
@@ -55,10 +59,13 @@ def blog(request):
     posts = BlogPost.objects.filter(published=True)
     if tag:
         posts = [p for p in posts if tag.lower() in [t.lower() for t in p.get_tags_list()]]
+    paginator = Paginator(posts, 9)
+    page = request.GET.get('page')
+    posts_page = paginator.get_page(page)
     all_tags = set()
     for p in BlogPost.objects.filter(published=True):
         all_tags.update(p.get_tags_list())
-    return render(request, 'core/blog.html', {'posts': posts, 'all_tags': sorted(all_tags), 'active_tag': tag})
+    return render(request, 'core/blog.html', {'posts': posts_page, 'all_tags': sorted(all_tags), 'active_tag': tag})
 
 
 def blog_detail(request, slug):
@@ -180,3 +187,53 @@ def _share_linkedin(post, url):
         return {'success': False, 'message': r.text}
     except Exception as e:
         return {'success': False, 'message': str(e)}
+
+
+def terms(request):
+    page = LegalPage.objects.filter(page_type='terms').first()
+    return render(request, 'core/legal.html', {'page': page, 'page_name': 'Terms of Service'})
+
+
+def privacy(request):
+    page = LegalPage.objects.filter(page_type='privacy').first()
+    return render(request, 'core/legal.html', {'page': page, 'page_name': 'Privacy Policy'})
+
+
+def sitemap(request):
+    pages = [
+        {'loc': '/', 'changefreq': 'weekly', 'priority': '1.0'},
+        {'loc': '/projects/', 'changefreq': 'weekly', 'priority': '0.9'},
+        {'loc': '/blog/', 'changefreq': 'weekly', 'priority': '0.8'},
+        {'loc': '/contact/', 'changefreq': 'monthly', 'priority': '0.7'},
+        {'loc': '/terms/', 'changefreq': 'monthly', 'priority': '0.3'},
+        {'loc': '/privacy/', 'changefreq': 'monthly', 'priority': '0.3'},
+    ]
+    from .models import Project, BlogPost
+    for project in Project.objects.all():
+        pages.append({'loc': f'/projects/{project.slug}/', 'changefreq': 'monthly', 'priority': '0.7', 'lastmod': project.updated_at})
+    for post in BlogPost.objects.filter(published=True):
+        pages.append({'loc': f'/blog/{post.slug}/', 'changefreq': 'monthly', 'priority': '0.7', 'lastmod': post.updated_at})
+
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    for p in pages:
+        xml += '  <url>\n'
+        xml += f'    <loc>{request.scheme}://{request.get_host()}{p["loc"]}</loc>\n'
+        xml += f'    <changefreq>{p["changefreq"]}</changefreq>\n'
+        xml += f'    <priority>{p["priority"]}</priority>\n'
+        if 'lastmod' in p:
+            xml += f'    <lastmod>{p["lastmod"].strftime("%Y-%m-%d")}</lastmod>\n'
+        xml += '  </url>\n'
+    xml += '</urlset>'
+    return HttpResponse(xml, content_type='application/xml')
+
+
+def robots(request):
+    lines = [
+        'User-agent: *',
+        'Disallow: /admin/',
+        'Disallow: /dashboard/',
+        '',
+        f'Sitemap: {request.scheme}://{request.get_host()}/sitemap.xml',
+    ]
+    return HttpResponse('\n'.join(lines), content_type='text/plain')
