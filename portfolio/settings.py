@@ -4,13 +4,6 @@ import shutil
 import tempfile
 from urllib.parse import unquote, urlparse
 
-try:
-    import cloudinary
-    import cloudinary_storage  # noqa: F401
-except ImportError:  # pragma: no cover - optional dependency in local/dev setups
-    cloudinary = None
-    cloudinary_storage = None
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -45,6 +38,23 @@ def load_environment_variables():
 
 
 load_environment_variables()
+
+# Import cloudinary AFTER env vars are loaded so the SDK picks up CLOUDINARY_URL
+try:
+    import cloudinary
+    import cloudinary_storage  # noqa: F401
+    # Explicitly configure cloudinary in case the SDK didn't auto-read env vars
+    _cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME', '')
+    _api_key = os.environ.get('CLOUDINARY_API_KEY', '')
+    _api_secret = os.environ.get('CLOUDINARY_API_SECRET', '')
+    _cloud_url = os.environ.get('CLOUDINARY_URL', '')
+    if _cloud_url:
+        cloudinary.config(cloudinary_url=_cloud_url)
+    elif _cloud_name and _api_key and _api_secret:
+        cloudinary.config(cloud_name=_cloud_name, api_key=_api_key, api_secret=_api_secret)
+except ImportError:  # pragma: no cover - optional dependency in local/dev setups
+    cloudinary = None
+    cloudinary_storage = None
 SECRET_KEY = 'django-insecure-change-this-in-production-use-env-variable'
 DEBUG = True
 ALLOWED_HOSTS = ['*']
