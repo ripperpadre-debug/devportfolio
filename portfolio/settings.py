@@ -6,6 +6,13 @@ from urllib.parse import unquote, urlparse
 
 from dotenv import load_dotenv
 
+try:
+    import cloudinary
+    import cloudinary_storage  # noqa: F401
+except ImportError:  # pragma: no cover - optional dependency in local/dev setups
+    cloudinary = None
+    cloudinary_storage = None
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
 SECRET_KEY = 'django-insecure-change-this-in-production-use-env-variable'
@@ -18,6 +25,17 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:5000',
 ]
 
+def use_cloudinary_storage():
+    return bool(
+        os.environ.get('CLOUDINARY_URL')
+        or (
+            os.environ.get('CLOUDINARY_CLOUD_NAME')
+            and os.environ.get('CLOUDINARY_API_KEY')
+            and os.environ.get('CLOUDINARY_API_SECRET')
+        )
+    ) and cloudinary is not None and cloudinary_storage is not None
+
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -25,8 +43,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core',
 ]
+
+if use_cloudinary_storage():
+    INSTALLED_APPS.extend(['cloudinary_storage', 'cloudinary'])
+
+INSTALLED_APPS.append('core')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -202,7 +224,15 @@ STATICFILES_DIRS = [BASE_DIR / 'core' / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = resolve_media_root()
+if use_cloudinary_storage():
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticCloudinaryStorage'
+    CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL', '')
+    CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', '')
+    CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '')
+    CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', '')
+else:
+    MEDIA_ROOT = resolve_media_root()
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

@@ -8,6 +8,16 @@ from django.test import SimpleTestCase
 from portfolio import settings as portfolio_settings
 
 
+class CloudinaryStorageTests(SimpleTestCase):
+    def test_use_cloudinary_storage_requires_cloudinary_credentials(self):
+        with patch.dict(os.environ, {}, clear=True):
+            self.assertFalse(portfolio_settings.use_cloudinary_storage())
+
+    def test_use_cloudinary_storage_enables_when_cloudinary_url_present(self):
+        with patch.dict(os.environ, {'CLOUDINARY_URL': 'cloudinary://test:test@test'}, clear=True):
+            self.assertTrue(portfolio_settings.use_cloudinary_storage())
+
+
 class DatabaseConfigTests(SimpleTestCase):
     def test_sqlite_config_uses_custom_path_when_set(self):
         with tempfile.TemporaryDirectory() as tmpdir:
