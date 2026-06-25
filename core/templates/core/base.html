@@ -132,9 +132,17 @@
 
   <!-- Cookie Consent Banner -->
   <div id="cookieBanner" role="dialog" aria-label="Cookie consent" aria-describedby="cookieBannerText">
-    <div class="cookie-content">
-      <p id="cookieBannerText">This site uses cookies to improve your experience. <a href="{% url 'privacy' %}">Learn more</a>.</p>
-      <button id="cookieAccept" class="cookie-btn" aria-label="Accept cookies">Got it</button>
+    <div class="cookie-container">
+      <div class="cookie-content">
+        <div class="cookie-icon">🍪</div>
+        <div class="cookie-text-wrap">
+          <p id="cookieBannerText"><strong>We value your experience</strong></p>
+          <p class="cookie-desc">This site uses cookies to enhance your experience and analyze traffic. <a href="{% url 'privacy' %}">Read our Privacy Policy</a>.</p>
+        </div>
+      </div>
+      <div class="cookie-actions">
+        <button id="cookieAccept" class="cookie-btn-primary" aria-label="Accept cookies">Accept</button>
+      </div>
     </div>
   </div>
   <script>
